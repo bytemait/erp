@@ -24,8 +24,8 @@ export function Sidenav({ navItems }: SidenavProps) {
 
     return (
         <nav className={cn("flex flex-col border-r transition-all duration-300", isCollapsed ? "w-16" : "w-64")}>
-            <div className="p-4">
-                <Button variant="ghost" className={`w-full ${isCollapsed ? 'justify-center' : 'justify-start'}`} onClick={() => setIsCollapsed(!isCollapsed)} >
+            <div className="pb-4">
+                <Button variant="ghost" className={`w-full justify-start`} onClick={() => setIsCollapsed(!isCollapsed)} >
                     <Menu className="h-4 w-4" />
                     {!isCollapsed && <span className="ml-2">Menu</span>}
                 </Button>

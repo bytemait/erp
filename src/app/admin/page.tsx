@@ -19,7 +19,7 @@ export default function Admin() {
         <div className="flex flex-1 overflow-hidden" >
           <Sidenav navItems={navItems} />
           <main className="flex-1 overflow-y-auto p-4" >
-            <h1 className="text-6xl text-center text-primary">Welcome to admin</h1>
+            <h1 className="text-6xl text-center text-primary pb-20">Welcome to admin</h1>
             <AdminPage />
           </main>
         </div>
