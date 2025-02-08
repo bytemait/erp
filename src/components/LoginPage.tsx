@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { FaMicrosoft } from "react-icons/fa6";
 import { useState } from "react";
 
-interface LandingPageProps {
+interface LoginPageProps {
   roles: string[];
 }
 
-export default function LandingPage({ roles }: LandingPageProps) {
+export default function LoginPage({ roles }: LoginPageProps) {
   const [selectedRole, setSelectedRole] = useState(roles[0] || "accounts");
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
