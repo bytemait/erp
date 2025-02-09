@@ -1,7 +1,11 @@
+import LoginPage from "@/components/LoginPage";
+
 export default function Home() {
+  const userRoles = ["accounts", "admin", "support"];
+
   return (
     <>
-      <h1 className="text-6xl text-center text-primary">Welcome to ERP</h1>
+      <LoginPage roles = {userRoles}/>
     </>
   );
 }
