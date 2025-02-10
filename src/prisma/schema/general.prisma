@@ -1,0 +1,31 @@
+// more like dynamic enums
+
+model Designation {
+  designation String    @id
+  Faculty     Faculty[]
+}
+
+model Department {
+  department String    @id
+  faculties  Faculty[]
+}
+
+model Batch {
+  batch    String    @id
+  students Student[]
+}
+
+model Branch {
+  branch  String    @id
+  Student Student[]
+}
+
+model Group {
+  group   String    @id
+  Student Student[]
+}
+
+model StaffType {
+  staffType String @id
+  Staff     Staff[]
+}

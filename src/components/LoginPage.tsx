@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FaMicrosoft } from "react-icons/fa6";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 interface LoginPageProps {
   roles: string[];
@@ -11,13 +12,26 @@ interface LoginPageProps {
 export default function LoginPage({ roles }: LoginPageProps) {
   const [selectedRole, setSelectedRole] = useState(roles[0] || "accounts");
 
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
     const formValues = Object.fromEntries(formData.entries());
 
     console.log("Form Data:", formValues);
+
+    const res = await signIn("admin", {
+      email: formValues.userId,
+      password: formValues.password,
+      // redirect: false,
+      redirectTo: "/dashboard/admin"
+    });
+    console.log(res, "res from credentials");
+  };
+
+  const handleMicrosoftLogin = async() => {
+    const res = await signIn("microsoft-entra-id");
+    console.log(res);
   };
 
   return (
@@ -31,7 +45,7 @@ export default function LoginPage({ roles }: LoginPageProps) {
           <h2 className="text-5xl font-bold text-gray-800 mb-10">
             For Faculty/Student
           </h2>
-          <Button className="w-full max-w-xs text-lg" size="lg">
+          <Button onClick={handleMicrosoftLogin} className="w-full max-w-xs text-lg" size="lg">
             <FaMicrosoft className="mr-2 h-5 w-5" />
             Login with Microsoft
           </Button>

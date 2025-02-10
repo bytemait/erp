@@ -1,0 +1,19 @@
+model RequestLog {
+  id        String   @id @default(cuid())
+  ipAddress String
+  endpoint  String
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ipAddress])
+}
+
+model BanList {
+  id          String   @id @default(cuid())
+  ipAddress   String   @unique
+  bannedUntil DateTime
+  reason      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
