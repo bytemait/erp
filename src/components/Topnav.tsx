@@ -12,12 +12,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import { signOut } from "next-auth/react"
 
 const profileItems = [
     { name: "Profile", href: "/profile" },
     { name: "Settings", href: "/settings" },
-  ]
+]
 
 export function Topnav() {
     return (
@@ -47,10 +47,11 @@ export function Topnav() {
                         </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Log out</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => signOut({
+                        redirectTo: "/",
+                    })}>Log out</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </nav>
     )
 }
-
