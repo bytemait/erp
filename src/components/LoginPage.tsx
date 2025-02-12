@@ -24,12 +24,12 @@ export default function LoginPage({ roles }: LoginPageProps) {
       email: formValues.userId,
       password: formValues.password,
       // redirect: false,
-      redirectTo: "/dashboard/admin"
+      redirectTo: "/admin",
     });
     console.log(res, "res from credentials");
   };
 
-  const handleMicrosoftLogin = async() => {
+  const handleMicrosoftLogin = async () => {
     const res = await signIn("microsoft-entra-id");
     console.log(res);
   };
@@ -45,7 +45,11 @@ export default function LoginPage({ roles }: LoginPageProps) {
           <h2 className="text-5xl font-bold text-gray-800 mb-10">
             For Faculty/Student
           </h2>
-          <Button onClick={handleMicrosoftLogin} className="w-full max-w-xs text-lg" size="lg">
+          <Button
+            onClick={handleMicrosoftLogin}
+            className="w-full max-w-xs text-lg"
+            size="lg"
+          >
             <FaMicrosoft className="mr-2 h-5 w-5" />
             Login with Microsoft
           </Button>
