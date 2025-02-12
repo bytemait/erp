@@ -53,13 +53,13 @@ export async function middleware(req: NextRequest) {
 
   if (token && pathname === "/") {
     if (token.role === role.STUDENT) {
-      return NextResponse.redirect(new URL("/dashboard/student", req.url));
+      return NextResponse.redirect(new URL("/student", req.url));
     } else if (token.role === role.FACULTY) {
-      return NextResponse.redirect(new URL("/dashboard/faculty", req.url));
+      return NextResponse.redirect(new URL("/faculty", req.url));
     } else if (token.role === role.STAFF) {
-      return NextResponse.redirect(new URL("/dashboard/staff", req.url));
+      return NextResponse.redirect(new URL("/staff", req.url));
     } else if (token.role === role.ADMIN) {
-      return NextResponse.redirect(new URL("/dashboard/admin", req.url));
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
   }
 
