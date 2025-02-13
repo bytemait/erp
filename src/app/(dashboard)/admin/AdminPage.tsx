@@ -1,6 +1,6 @@
 "use client"
 import { Menucard } from "@/components/Menucard";
-import { Mail, Calendar, CreditCard, LineChart } from "lucide-react"
+import { Mail, Calendar, CreditCard, LineChart , User} from "lucide-react"
 
 export default function AdminPage() {
 
@@ -33,6 +33,13 @@ export default function AdminPage() {
             color: "bg-slate-500",
             route: "/admin/analytics"
         },
+        {
+            title :"User Management",
+            description :"Manage your users and their roles",
+            icon : User,
+            color : "bg-slate-500",
+            route : "admin/users"
+        }
     ]
 
     return (
