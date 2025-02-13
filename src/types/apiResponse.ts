@@ -1,5 +1,6 @@
 export interface ApiResponse<T> {
-    data: T | undefined
-    success: boolean | undefined
-    message: string | undefined
+    success: boolean;
+    status: number;
+    data?: T;
+    message?: string;
 }
