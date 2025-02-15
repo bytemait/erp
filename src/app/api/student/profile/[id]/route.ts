@@ -36,6 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   try {
     const { id } = params;
     const data = await req.json();
+    const email = data.email;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
@@ -43,15 +44,26 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (!data) {
       return NextResponse.json(errorResponse(400, "Data is required"), { status: 400 });
     }
+    if (email){
+      return NextResponse.json(errorResponse(400, "Email cannot be updated"), { status: 400 });
+    }
 
     const updatedProfile = await prisma.student.update({
       where: { id: String(id) },
       data,
     });
+    const userupdatedProfile = await prisma.user.updateMany({
+      where: { userId: String(id) },
+      data: {
+        name: data.name,
+      },
+    });
 
     if (!updatedProfile) {
-      return NextResponse.json(errorResponse(404, "User profile not found"), { status: 404 });
+      return NextResponse.json(errorResponse(404, "Student profile not found"), { status: 404 });
     }
+    if (!userupdatedProfile) {
+      return NextResponse.json(errorResponse(404, "User profile not found"), { status: 404 });}
 
     return NextResponse.json(successResponse(200, updatedProfile, "Profile updated successfully"), { status: 200 });
   } catch (err) {
