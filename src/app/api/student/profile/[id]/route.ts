@@ -46,6 +46,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const { id } = params;
     const data = await req.json();
     const email = data.email;
+    const enrollment = data.enrollmentNo;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
@@ -55,6 +56,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
     if (email){
       return NextResponse.json(errorResponse(400, "Email cannot be updated"), { status: 400 });
+    }
+    if (enrollment){
+      return NextResponse.json(errorResponse(400, "Enrollment Number cannot be updated"), { status: 400 });
     }
 
     const updatedProfile = await prisma.student.update({
