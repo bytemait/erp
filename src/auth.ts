@@ -126,11 +126,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                                 name: name,
                             },
                         });
+                        await prisma.studentDetails.create({
+                            data: {
+                                studentId: newUser.id,
+                            },
+                        });
+
                     } else if (userRole === role.FACULTY) {
                         newUser = await prisma.faculty.create({
                             data: {
                                 email: user.email,
                                 name: name
+                            },
+                        });
+                        await prisma.facultyDetails.create({
+                            data: {
+                                facultyId: newUser.id,
                             },
                         });
                     } else {
