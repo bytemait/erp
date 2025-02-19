@@ -1,22 +1,22 @@
-import prisma from "@/utils/prisma";
+import prisma from "./prisma";
 
 export async function createNotification(
-    userId: string | null,
+    userId: string,
     title: string,
     message: string
 ) {
+
     try {
         const notification = await prisma.notification.create({
             data: {
-                userId,
-                title,
-                message,
+                userId: userId,
+                title: title,
+                message: message,
             },
         });
 
         return { success: true, data: notification };
     } catch (error) {
-        console.error("Error creating notification:", error);
-        return { success: false, error: "Failed to create notification" };
+        return { success: false, error: error };
     }
 }
