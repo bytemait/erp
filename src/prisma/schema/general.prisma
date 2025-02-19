@@ -26,6 +26,6 @@ model Group {
 }
 
 model StaffType {
-  staffType String @id
+  staffType String  @id
   Staff     Staff[]
 }

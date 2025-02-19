@@ -45,23 +45,23 @@ export async function middleware(req: NextRequest) {
       : pathname === path
   );
 
-  if (!token) {
-    if (isStudentPath || isFacultyPath || isStaffPath || isAdminPath) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
+  if (!token && (isStudentPath || isFacultyPath || isStaffPath || isAdminPath)) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   if (token && pathname === "/") {
-    if (token.role === role.STUDENT) {
-      return NextResponse.redirect(new URL("/student", req.url));
-    } else if (token.role === role.FACULTY) {
-      return NextResponse.redirect(new URL("/faculty", req.url));
-    } else if (token.role === role.STAFF) {
-      return NextResponse.redirect(new URL("/staff", req.url));
-    } else if (token.role === role.ADMIN) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+    switch (token.role) {
+      case role.STUDENT:
+        return NextResponse.redirect(new URL("/student", req.url));
+      case role.FACULTY:
+        return NextResponse.redirect(new URL("/faculty", req.url));
+      case role.STAFF:
+        return NextResponse.redirect(new URL("/staff", req.url));
+      case role.ADMIN:
+        return NextResponse.redirect(new URL("/admin", req.url));
     }
   }
+
 
   if (isStudentPath && token?.role !== role.STUDENT) {
     return NextResponse.redirect(new URL("/403", req.url));
