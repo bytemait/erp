@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import {
 	DropdownMenu,
-	
+
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
@@ -24,24 +24,24 @@ import Modal from "@/components/Modal";
 import UserForm from "./UserForm";
 
 function UserMangementPage() {
-	
+
 	const [isOpen, setIsOpen] = useState(false);
-	const [type , setType] = useState('');
-	
+	const [type, setType] = useState('');
+
 
 
 	const modalOpenCloseHandler = () => {
 		setIsOpen(!isOpen);
 	};
-	const handleLabelClick = (type : string) => {
+	const handleLabelClick = (type: string) => {
 		setType(type);
-		
+
 		modalOpenCloseHandler();
-		
+
 
 	}
 
-	
+
 
 	function actionColumn() {
 		return (
@@ -58,7 +58,7 @@ function UserMangementPage() {
 					<DropdownMenuItem onClick={() => handleLabelClick('Edit')}>
 						EDIT
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={()=> handleLabelClick("Delete")}>DELETE</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => handleLabelClick("Delete")}>DELETE</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		);
@@ -83,17 +83,17 @@ function UserMangementPage() {
 	];
 
 	return (
-		<>	
+		<>
 			<div className="flex justify-between items-center mb-4 flex-row-reverse">
 
-				<Button onClick={()=>handleLabelClick("Create")}>Create</Button>
+				<Button onClick={() => handleLabelClick("Create")}>Create</Button>
 			</div>
 			{isOpen && (
 				<Modal onClose={modalOpenCloseHandler}>
 					<UserForm onClose={modalOpenCloseHandler} formLabel={type} />
 				</Modal>
 			)}{" "}
-			
+
 			<Table>
 				<TableCaption>A list of Users.</TableCaption>
 				<TableHeader>
@@ -121,7 +121,7 @@ function UserMangementPage() {
 					))}
 				</TableBody>
 			</Table>
-			
+
 		</>
 	);
 }

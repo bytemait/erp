@@ -54,10 +54,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (!data) {
       return NextResponse.json(errorResponse(400, "Data is required"), { status: 400 });
     }
-    if (email){
+    if (email) {
       return NextResponse.json(errorResponse(400, "Email cannot be updated"), { status: 400 });
     }
-    if (enrollment){
+    if (enrollment) {
       return NextResponse.json(errorResponse(400, "Enrollment Number cannot be updated"), { status: 400 });
     }
 
@@ -76,7 +76,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json(errorResponse(404, "Student profile not found"), { status: 404 });
     }
     if (!userupdatedProfile) {
-      return NextResponse.json(errorResponse(404, "User profile not found"), { status: 404 });}
+      return NextResponse.json(errorResponse(404, "User profile not found"), { status: 404 });
+    }
 
     return NextResponse.json(successResponse(200, serializeBigInt(updatedProfile), "Profile updated successfully"), { status: 200 });
   } catch (err) {

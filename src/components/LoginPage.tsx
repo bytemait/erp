@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FaMicrosoft } from "react-icons/fa6";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 interface LoginPageProps {
   roles: string[];
@@ -30,8 +31,12 @@ export default function LoginPage({ roles }: LoginPageProps) {
   };
 
   const handleMicrosoftLogin = async () => {
-    const res = await signIn("microsoft-entra-id");
-    console.log(res);
+    try {
+      const res = await signIn('microsoft-entra-id');
+      console.log(res)
+    } catch (error) {
+      toast.error(`An error occurred: ${error}`);
+    }
   };
 
   return (
@@ -76,9 +81,8 @@ export default function LoginPage({ roles }: LoginPageProps) {
                   className="absolute transition-all duration-300 h-10 bg-white rounded-full shadow-lg"
                   style={{
                     width: `${100 / roles.length}%`,
-                    left: `${
-                      (roles.indexOf(selectedRole) * 100) / roles.length
-                    }%`,
+                    left: `${(roles.indexOf(selectedRole) * 100) / roles.length
+                      }%`,
                   }}
                 />
                 <div className="relative h-full flex">
@@ -88,10 +92,9 @@ export default function LoginPage({ roles }: LoginPageProps) {
                       type="button"
                       onClick={() => setSelectedRole(role)}
                       className={`flex-1 flex items-center justify-center capitalize font-medium transition-colors duration-300 z-10
-                        ${
-                          selectedRole === role
-                            ? "text-gray-800"
-                            : "text-gray-500 hover:text-gray-700"
+                        ${selectedRole === role
+                          ? "text-gray-800"
+                          : "text-gray-500 hover:text-gray-700"
                         }`}
                     >
                       {role}

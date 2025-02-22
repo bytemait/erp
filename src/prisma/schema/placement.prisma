@@ -1,0 +1,78 @@
+model Company {
+    id          String   @id @default(uuid())
+    name        String
+    website     String?
+    industry    String?
+    description String?
+    createdAt   DateTime @default(now())
+
+    jobListings JobListing[]
+}
+
+model JobListing {
+    id             String   @id @default(uuid())
+    title          String
+    companyId      String
+    batchId        String
+    branchId       String
+    cutoffCriteria Float? // GPA/CGPA requirement
+    additionalReq  String?
+    createdAt      DateTime @default(now())
+
+    jobProfiles        JobProfile[]
+    applications       Application[]
+    interviewSchedules InterviewSchedule[]
+
+    company Company @relation(fields: [companyId], references: [id])
+    //   batch          Batch?    @relation(fields: [batchId], references: [batch])
+    //   branch         Branch?   @relation(fields: [branchId], references: [branch])
+}
+
+model JobProfile {
+    id           String  @id @default(uuid())
+    title        String
+    description  String?
+    salary       Float?
+    jobListingId String
+
+    jobListing JobListing @relation(fields: [jobListingId], references: [id])
+}
+
+model Application {
+    id           String   @id @default(uuid())
+    studentId    String
+    jobListingId String
+    resumeUrl    String
+    coverLetter  String?
+    status       String   @default("Pending") // "Pending", "Accepted", "Rejected"
+    createdAt    DateTime @default(now())
+
+    jobListing JobListing @relation(fields: [jobListingId], references: [id])
+    student    Student    @relation(fields: [studentId], references: [id])
+}
+
+model InterviewSchedule {
+    id           String   @id @default(uuid())
+    jobListingId String
+    date         DateTime
+    minTime      DateTime
+    maxTime      DateTime
+    slotLength   Int
+    externalLink String?
+    createdAt    DateTime @default(now())
+
+    interviewSlots InterviewSlot[]
+
+    jobListing JobListing @relation(fields: [jobListingId], references: [id])
+}
+
+model InterviewSlot {
+    id                  String  @id @default(uuid())
+    interviewScheduleId String
+    studentId           String?
+    confirmed           Boolean @default(false)
+    joinLink            String?
+
+    interviewSchedule InterviewSchedule @relation(fields: [interviewScheduleId], references: [id])
+    student           Student?          @relation(fields: [studentId], references: [id])
+}

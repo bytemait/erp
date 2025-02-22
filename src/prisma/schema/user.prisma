@@ -1,7 +1,7 @@
 model User {
   id     String  @id @default(cuid())
   role   Role    @default(STUDENT)
-  userId String
+  userId String  @unique
   email  String  @unique
   name   String?
   mobile String? @db.VarChar(10)
@@ -23,6 +23,9 @@ model Student {
   studentDetailsId String?         @unique
   details          StudentDetails?
   image            String?
+
+  applications   Application[]
+  interviewSlots InterviewSlot[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
