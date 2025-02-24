@@ -22,6 +22,7 @@ import { MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal";
 import UserForm from "./UserForm";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface User {
 	userId: string;
@@ -49,10 +50,20 @@ function UserMangementPage() {
 	};
 	const handleDelete = async (userId: string) => {
 		try {
-			await axios.delete(`/api/admin/users/${userId}`);
+			const res = await axios.delete(`/api/admin/users/${userId}`);
+			console.log(res)
+			if(res.status !== 200) {
+				toast.error(res.data.message);
+				return;
+			}
+
 			setUsers(users.filter((user) => user.userId !== userId));
+
+
+
 		} catch (error) {
 			console.error("DELETE Error:", error);
+			toast.error("Something went wrong");
 		}
 	};
 
@@ -62,7 +73,13 @@ function UserMangementPage() {
 				const response = await axios.get("/api/admin/users");
 				const data = await response.data;
 				setUsers(data.data);
-				console.log(data.data);
+
+				if(data.status === 404) {
+					
+					toast.error("No users found");
+
+				}
+				
 			} catch (error) {
 				console.error("GET Error:", error);
 			}

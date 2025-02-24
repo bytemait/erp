@@ -82,6 +82,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
                     status: 404,
                 });
             }
+            if(admin.email != email) {
+                const emailExists = await prisma.admin.findFirst({
+                    where: { email },
+                });
+                if (emailExists) {
+                    return NextResponse.json(
+                        errorResponse(409, "Email already exists"),
+                        { status: 409 }
+                    );
+                }
+            }
             updatedUser = await prisma.admin.update({
                 where: { id },
                 data: {
@@ -92,12 +103,21 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
             });
 			console.log(updatedUser);
         } else if (role === "STAFF") {
+            
             const staff = await prisma.staff.findUnique({ where: { id } });
+            
             if (!staff) {
                 return NextResponse.json(errorResponse(404, "Staff not found"), {
                     status: 404,
                 });
             }
+            if(staff.email != email) {
+                return NextResponse.json(
+                    errorResponse(409, "Email already exists"),
+                    { status: 409 }
+                )
+            }
+            
             updatedUser = await prisma.staff.update({
                 where: { id },
                 data: {
@@ -153,8 +173,24 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         const role = userExisted.role;
 
         if (role === "ADMIN") {
+            const admin = await prisma.admin.findUnique({ where: { id } });
+            if (!admin) {
+                return NextResponse.json(errorResponse(404, "Admin not found"), {
+                    status: 404,
+                });
+            }
             await prisma.admin.delete({ where: { id } });
+        
         } else if (role === "STAFF") {
+            const staff = await prisma.staff.findUnique({ where: { id } });
+            if (!staff) {
+                return NextResponse.json(errorResponse(404, "Staff not found"), {
+                    status: 404,
+                });
+            }
+            
+
+
             await prisma.staff.delete({ where: { id } });
         }
 

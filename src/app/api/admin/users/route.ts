@@ -117,6 +117,12 @@ export async function GET() {
 			},
 		});
 
+		if (!users) {
+			return NextResponse.json(errorResponse(404, "No users found"), {
+				status: 404,
+			});
+		}
+
 		return NextResponse.json(successResponse(200, users), { status: 200 });
 	} catch (error) {
 		console.error("GET Error:", error);
