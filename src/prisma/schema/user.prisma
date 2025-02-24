@@ -21,7 +21,7 @@ model Student {
   branchId         String?
   groupId          String?
   studentDetailsId String?         @unique
-  details          StudentDetails?
+  // details          StudentDetails?
   image            String?
 
   JobProfile     JobProfile[]
@@ -33,11 +33,12 @@ model Student {
   batch  Batch?  @relation(fields: [batchId], references: [batch], onDelete: Restrict, onUpdate: Cascade)
   branch Branch? @relation(fields: [branchId], references: [branch], onDelete: Restrict, onUpdate: Cascade)
   group  Group?  @relation(fields: [groupId], references: [group], onDelete: Restrict, onUpdate: Cascade)
+  details StudentDetails? @relation(fields: [studentDetailsId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 }
 
 model StudentDetails {
   id                    String    @id @default(cuid())
-  studentId             String    @unique
+  studentId             Student?   
   ipuRegistrationNumber String?   @unique @db.VarChar(12)
   dob                   DateTime?
   fullAddress           String?
@@ -83,7 +84,7 @@ model StudentDetails {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  // student Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Admin {
@@ -104,7 +105,8 @@ model Faculty {
   mobile        String?
   designationId String?
   departmentId  String?
-  details       FacultyDetails?
+  facultyDetailsId String?      @unique
+  // details       FacultyDetails?
   image         String?
 
   createdAt DateTime @default(now())
@@ -112,11 +114,13 @@ model Faculty {
 
   designation Designation? @relation(fields: [designationId], references: [designation], onDelete: Restrict, onUpdate: Cascade)
   department  Department?  @relation(fields: [departmentId], references: [department], onDelete: Restrict, onUpdate: Cascade)
+  details FacultyDetails? @relation(fields: [facultyDetailsId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
 }
 
 model FacultyDetails {
   id                 String      @id @default(cuid())
-  facultyId          String      @unique
+  facultyId          Faculty?
   employeeCode       String?     @db.VarChar(10)
   dob                DateTime?
   fullAddress        String?     @db.VarChar(150)
@@ -132,7 +136,7 @@ model FacultyDetails {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  // faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Staff {

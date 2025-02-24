@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Table,
 	TableBody,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import {
 	DropdownMenu,
-
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
@@ -22,28 +21,73 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal";
 import UserForm from "./UserForm";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+interface User {
+	userId: string;
+	name: string;
+	email: string;
+	password: string;
+	role: string;
+}
 
 function UserMangementPage() {
-
 	const [isOpen, setIsOpen] = useState(false);
-	const [type, setType] = useState('');
-
-
+	const [type, setType] = useState("");
+	const [users, setUsers] = useState<User[]>([]);
+	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
 	const modalOpenCloseHandler = () => {
 		setIsOpen(!isOpen);
 	};
-	const handleLabelClick = (type: string) => {
+	const handleLabelClick = (type: string, user?: User) => {
 		setType(type);
 
+		setSelectedUser(user || null);
+
 		modalOpenCloseHandler();
+	};
+	const handleDelete = async (userId: string) => {
+		try {
+			const res = await axios.delete(`/api/admin/users/${userId}`);
+			console.log(res)
+			if(res.status !== 200) {
+				toast.error(res.data.message);
+				return;
+			}
+
+			setUsers(users.filter((user) => user.userId !== userId));
 
 
-	}
 
+		} catch (error) {
+			console.error("DELETE Error:", error);
+			toast.error("Something went wrong");
+		}
+	};
 
+	useEffect(() => {
+		const getUsers = async () => {
+			try {
+				const response = await axios.get("/api/admin/users");
+				const data = await response.data;
+				setUsers(data.data);
 
-	function actionColumn() {
+				if(data.status === 404) {
+					
+					toast.error("No users found");
+
+				}
+				
+			} catch (error) {
+				console.error("GET Error:", error);
+			}
+		};
+		getUsers();
+	}, [selectedUser ,isOpen]);
+
+	function actionColumn(user: User) {
 		return (
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -55,73 +99,62 @@ function UserMangementPage() {
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => handleLabelClick('Edit')}>
+					<DropdownMenuItem
+						onClick={() => handleLabelClick("Edit", user)}
+					>
 						EDIT
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => handleLabelClick("Delete")}>DELETE</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => handleDelete(user.userId)}>
+						DELETE
+					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		);
 	}
 
-	const dummyData = [
-		{ id: "32423444", name: "KushAheer", department: "CST", role: "Admin" },
-		{ id: "32423445", name: "JohnDoe", department: "ECE", role: "User" },
-		{
-			id: "32423446",
-			name: "JaneSmith",
-			department: "EEE",
-			role: "Moderator",
-		},
-		{
-			id: "32423447",
-			name: "AliceJohnson",
-			department: "ME",
-			role: "Admin",
-		},
-		{ id: "32423448", name: "BobBrown", department: "CE", role: "User" },
-	];
-
 	return (
 		<>
 			<div className="flex justify-between items-center mb-4 flex-row-reverse">
-
-				<Button onClick={() => handleLabelClick("Create")}>Create</Button>
+				<Button onClick={() => handleLabelClick("Create")}>
+					Create
+				</Button>
 			</div>
 			{isOpen && (
 				<Modal onClose={modalOpenCloseHandler}>
-					<UserForm onClose={modalOpenCloseHandler} formLabel={type} />
+					<UserForm
+						userData={selectedUser}
+						onClose={modalOpenCloseHandler}
+						formLabel={type}
+					/>
 				</Modal>
 			)}{" "}
-
 			<Table>
 				<TableCaption>A list of Users.</TableCaption>
 				<TableHeader>
 					<TableRow>
 						<TableHead className="w-[100px]">Id</TableHead>
 						<TableHead>Full Name</TableHead>
-						<TableHead>Department</TableHead>
+						<TableHead>Email</TableHead>
 						<TableHead className="text-right">Role</TableHead>
 						<TableHead className="text-right">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{dummyData.map((user) => (
-						<TableRow key={user.id}>
-							<TableCell>{user.id}</TableCell>
-							<TableCell>{user.name}</TableCell>
-							<TableCell>{user.department}</TableCell>
+					{users.map((item) => (
+						<TableRow key={item.userId}>
+							<TableCell>{item.userId}</TableCell>
+							<TableCell>{item.name}</TableCell>
+							<TableCell>{item.email}</TableCell>
 							<TableCell className="text-right">
-								{user.role}{" "}
+								{item.role}{" "}
 							</TableCell>
 							<TableCell className="text-right">
-								{actionColumn()}
+								{actionColumn(item)}
 							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
 			</Table>
-
 		</>
 	);
 }
