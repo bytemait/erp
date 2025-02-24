@@ -1,65 +1,94 @@
 model Company {
-    id          String   @id @default(uuid())
+    id          String  @id @default(cuid())
     name        String
+    email       String?
+    logo        String?
     website     String?
+    location    String?
     industry    String?
     description String?
-    createdAt   DateTime @default(now())
 
     jobListings JobListing[]
+
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
 }
 
 model JobListing {
-    id             String   @id @default(uuid())
-    title          String
-    companyId      String
-    batchId        String
-    branchId       String
-    cutoffCriteria Float? // GPA/CGPA requirement
-    additionalReq  String?
-    createdAt      DateTime @default(now())
+    id           String   @id @default(cuid())
+    title        String
+    companyId    String
+    filters      Json?
+    cgpaCutoff   Float?
+    requirements String?
+    role         String?
+    description  String?
+    type         JobType?
 
-    jobProfiles        JobProfile[]
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+
     applications       Application[]
     interviewSchedules InterviewSchedule[]
 
-    company Company @relation(fields: [companyId], references: [id])
-    //   batch          Batch?    @relation(fields: [batchId], references: [batch])
-    //   branch         Branch?   @relation(fields: [branchId], references: [branch])
+    company Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model JobProfile {
-    id           String  @id @default(uuid())
-    title        String
-    description  String?
-    salary       Float?
-    jobListingId String
+    id                String   @id @default(cuid())
+    studentId         String
+    aboutMe           String?
+    resumeUrl         String?
+    githubUrl         String?
+    linkedinUrl       String?
+    portfolioUrl      String?
+    currentSalary     Float?
+    expectedSalary    Float?
+    skills            String?
+    achievements      String?
+    certifications    String?
+    preferredLocation String?
+    preferredJobType  JobType?
+    isOpenToRelocate  Boolean  @default(false)
+    noticePeriod      Int?
+    yearsOfExperience Float?
+    workExperience    Json?
+    cgpa              Float?
+    backlogCount      Int      @default(0)
 
-    jobListing JobListing @relation(fields: [jobListingId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    applications Application[]
+
+    student Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Application {
-    id           String   @id @default(uuid())
-    studentId    String
+    id           String            @id @default(cuid())
+    jobProfileId String?
     jobListingId String
-    resumeUrl    String
+    resumeUrl    String?
     coverLetter  String?
-    status       String   @default("Pending") // "Pending", "Accepted", "Rejected"
-    createdAt    DateTime @default(now())
+    status       ApplicationStatus @default(PENDING)
 
-    jobListing JobListing @relation(fields: [jobListingId], references: [id])
-    student    Student    @relation(fields: [studentId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    jobListing JobListing  @relation(fields: [jobListingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    jobProfile JobProfile? @relation(fields: [jobProfileId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model InterviewSchedule {
-    id           String   @id @default(uuid())
+    id           String    @id @default(cuid())
     jobListingId String
     date         DateTime
-    minTime      DateTime
-    maxTime      DateTime
+    startTime    DateTime?
+    endTime      DateTime?
     slotLength   Int
-    externalLink String?
-    createdAt    DateTime @default(now())
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     interviewSlots InterviewSlot[]
 
@@ -67,12 +96,15 @@ model InterviewSchedule {
 }
 
 model InterviewSlot {
-    id                  String  @id @default(uuid())
+    id                  String  @id @default(cuid())
     interviewScheduleId String
     studentId           String?
     confirmed           Boolean @default(false)
     joinLink            String?
 
-    interviewSchedule InterviewSchedule @relation(fields: [interviewScheduleId], references: [id])
-    student           Student?          @relation(fields: [studentId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    interviewSchedule InterviewSchedule @relation(fields: [interviewScheduleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    student           Student?          @relation(fields: [studentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
