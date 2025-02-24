@@ -7,7 +7,7 @@ import axios from "axios";
 export const getClientSession = async () => {
     const session = await axios.get("/api/auth/session");
     // const session = await auth();
-    return session.data.user;
+    return session?.data?.user;
 };
 
 export const getServerToken = async (req: NextRequest) => {

@@ -22,7 +22,7 @@ export default function StudentLayout({
   return (
     <div className="flex h-screen flex-col" >
       <Topnav />
-      < div className="flex flex-1 overflow-hidden" >
+      <div className="flex flex-1 overflow-hidden" >
         <Sidenav navItems={navItems} />
         {children}
       </div>

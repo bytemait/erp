@@ -16,6 +16,8 @@ import { signOut } from "next-auth/react"
 import { NotificationPanel } from "./NotificationPanel"
 import { getClientSession } from "@/utils/session"
 import { useEffect, useState } from "react"
+import { useAppDispatch } from "@/store/hooks"
+import { clearUser } from "@/store/slices/userSlice"
 
 const profileItems = [
     { name: "Profile", href: "/profile" },
@@ -29,6 +31,8 @@ interface UserType {
 }
 
 export function Topnav() {
+
+    const dispatch = useAppDispatch();
 
     const [user, setUser] = useState<UserType>({ name: "", role: "", email: "" });
 
@@ -84,10 +88,12 @@ export function Topnav() {
                         ))}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() =>
+                            onClick={() => {
                                 signOut({
                                     redirectTo: "/",
                                 })
+                                dispatch(clearUser());
+                            }
                             }
                         >
                             Log out

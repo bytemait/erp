@@ -2,40 +2,90 @@
 
 import { Button } from "@/components/ui/button";
 import { FaMicrosoft } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
+import { useAppDispatch } from "@/store/hooks";
+import { setUser } from "@/store/slices/userSlice";
+import axios from "axios";
 
 interface LoginPageProps {
   roles: string[];
 }
 
 export default function LoginPage({ roles }: LoginPageProps) {
-  const [selectedRole, setSelectedRole] = useState(roles[0] || "accounts");
+  const dispatch = useAppDispatch();
+  const [selectedRole, setSelectedRole] = useState(roles[0] || "Staff");
+  const [loading, setLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (loggedIn) {
+      const getUserAfterLogin = async (): Promise<null> => {
+        const user = await axios.get("/api/public/me");
+        if (!user) return null;
+        dispatch(setUser(user.data.data));
+        toast.success("Login successful");
+        return null;
+      };
+      getUserAfterLogin();
+    }
+  }, [loggedIn, dispatch]);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const formValues = Object.fromEntries(formData.entries());
+    try {
 
-    console.log("Form Data:", formValues);
+      const formData = new FormData(e.currentTarget);
+      const formValues = Object.fromEntries(formData.entries());
 
-    const res = await signIn("admin", {
-      email: formValues.userId,
-      password: formValues.password,
-      // redirect: false,
-      redirectTo: "/admin",
-    });
-    console.log(res, "res from credentials");
+      console.log("Form Data:", formValues);
+
+      let res;
+      if (formValues.role === "Admin") {
+        res = await signIn("admin", {
+          email: formValues.userId,
+          password: formValues.password,
+          // redirect: false,
+          redirectTo: "/admin",
+        });
+      } else if (formValues.role === "Staff") {
+        res = await signIn("staff", {
+          email: formValues.userId,
+          password: formValues.password,
+          // redirect: false,
+          redirectTo: "/staff",
+        });
+      } else {
+        toast.error("Invalid Role");
+      }
+      console.log(res, "res from login");
+
+      if (res?.ok && res?.error === null) {
+        setLoggedIn(true);
+      }
+    } catch (error) {
+      toast.error('An error occurred during login');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMicrosoftLogin = async () => {
     try {
-      const res = await signIn('microsoft-entra-id');
-      console.log(res)
+      setLoading(true);
+      await signIn('microsoft-entra-id', {
+        redirect: false,
+      }).then(() => {
+        setLoggedIn(true);
+      });
     } catch (error) {
       toast.error(`An error occurred: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +95,6 @@ export default function LoginPage({ roles }: LoginPageProps) {
       style={{ background: "linear-gradient(135deg, #ffffff, #f0f0f0)" }}
     >
       <div className="flex flex-col md:flex-row w-full min-h-[700px] p-6">
-        {/* Faculty/Student Section */}
         <div className="flex-1 flex p-6 md:p-8 flex-col items-center justify-center">
           <h2 className="text-5xl font-bold text-gray-800 mb-10">
             For Faculty/Student
@@ -54,13 +103,13 @@ export default function LoginPage({ roles }: LoginPageProps) {
             onClick={handleMicrosoftLogin}
             className="w-full max-w-xs text-lg"
             size="lg"
+            disabled={loading}
           >
-            <FaMicrosoft className="mr-2 h-5 w-5" />
-            Login with Microsoft
+            <FaMicrosoft color="white" className="mr-2 h-5 w-5" />
+            {loading ? "Logging in..." : "Login with Microsoft"}
           </Button>
         </div>
 
-        {/* Divider */}
         <div className="inset-0  flex items-center justify-center">
           <div className="relative flex flex-col items-center h-full">
             <div className="flex-1 w-[2px] border border-gray-400" />
@@ -69,10 +118,9 @@ export default function LoginPage({ roles }: LoginPageProps) {
           </div>
         </div>
 
-        {/* Other Staff Section */}
         <div className="flex-1 p-6 md:p-8 flex flex-col items-center justify-center">
           <h2 className="text-5xl font-bold text-center text-gray-800 mb-6">
-            For Other Staff
+            For Staff/Admin
           </h2>
           <form onSubmit={submitHandler} className="space-y-4">
             <div className="w-full max-w-md p-4">
@@ -107,7 +155,7 @@ export default function LoginPage({ roles }: LoginPageProps) {
 
             <input
               className="h-9 w-full rounded-md border-gray-300 border-input outline-none bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground border-2 focus-visible:ring-1 focus-visible:ring-ring md:text-sm"
-              placeholder="User Id"
+              placeholder="Email"
               name="userId"
               type="text"
             />
@@ -118,7 +166,9 @@ export default function LoginPage({ roles }: LoginPageProps) {
               type="password"
             />
             <div className="flex justify-center">
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Logging in..." : "Submit"}
+              </Button>
             </div>
           </form>
         </div>

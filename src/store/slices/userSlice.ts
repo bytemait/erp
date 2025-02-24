@@ -1,16 +1,7 @@
-import { Role } from '@prisma/client'
+import { User } from '@/types/user'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface UserState {
-    id: string
-    name: string
-    email: string
-    mobile: string
-    role: Role | null
-    child: object
-}
-
-const initialState: UserState = {
+const initialState: User = {
     id: "",
     name: "",
     email: "",
@@ -23,7 +14,7 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<UserState>) => {
+        setUser: (state, action: PayloadAction<User>) => {
             return action.payload
         },
         clearUser: () => initialState,
