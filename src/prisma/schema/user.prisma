@@ -24,7 +24,7 @@ model Student {
   // details          StudentDetails?
   image            String?
 
-  applications   Application[]
+  JobProfile     JobProfile[]
   interviewSlots InterviewSlot[]
 
   createdAt DateTime @default(now())
