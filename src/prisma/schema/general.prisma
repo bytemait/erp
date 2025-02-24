@@ -17,12 +17,12 @@ model Batch {
 
 model Branch {
   branch  String    @id
-  Student Student[]
+  students Student[]
 }
 
 model Group {
   group   String    @id
-  Student Student[]
+  students Student[]
 }
 
 model StaffType {
