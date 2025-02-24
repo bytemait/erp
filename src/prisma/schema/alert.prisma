@@ -10,10 +10,11 @@ model Notification {
 }
 
 model Announcement {
-  id      String @id @default(cuid())
-  title   String
-  message String
-  filter  Json?
+    id      String @id @default(cuid())
+    title   String
+    message String
+    filter  Json?
+    role    Role
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
