@@ -8,6 +8,7 @@ import {
 } from "@/utils/response";
 import { Announcement } from "@prisma/client";
 import { createAnnouncementNotifications } from "@/utils/annoucement-notif";
+import { createNotification } from "@/utils/alerts";
 import { getServerToken } from "@/utils/session";
 
 export async function GET(
@@ -47,7 +48,7 @@ export async function GET(
       const filter = announcement.filter || {};
       // if empty filter, return all announcements
       if (Object.keys(filter).length === 0) {
-        return announcement.role === "ADMIN";
+        return announcement.role === "ADMIN" || announcement.issuer==id;
       }
       // role checking
       if (announcement.role !== "ADMIN") {
@@ -72,7 +73,13 @@ export async function POST(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse<Announcement | null>>> {
   try {
+    const token = await getServerToken(req);
+    if (!token || !token.id) return NextResponse.json(errorResponse(401, "Unauthorized"), { status: 401 });
+
+    const issuer = token.id;
+
     const { title, message, filter, role } = await req.json();
+    const data = { title, message, filter, role, issuer: String(issuer) };
 
     if (!title || !message || !role) {
       return NextResponse.json(errorResponse(400, "Missing required fields"), {
@@ -81,7 +88,7 @@ export async function POST(
     }
 
     const announcement = await prisma.announcement.create({
-      data: { title, message, filter, role },
+      data,
     });
 
     const announcementWithCorrectFilter = {
@@ -89,6 +96,7 @@ export async function POST(
       filter: announcement.filter as Record<string, string | number | boolean | Date | null>,
     };
     createAnnouncementNotifications(announcementWithCorrectFilter);
+    createNotification(String(token.id),"You created a new announcement",announcement.title);
     console.log("notification created");
 
     return NextResponse.json(

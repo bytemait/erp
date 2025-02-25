@@ -46,7 +46,7 @@ export async function GET(
       const filter = announcement.filter || {};
       // if empty filter, return all announcements
       if (Object.keys(filter).length === 0) {
-        return announcement.role === "STUDENT";
+        return announcement.role === "STUDENT"
       }
       // role checking
       if (announcement.role !== "STUDENT") {
