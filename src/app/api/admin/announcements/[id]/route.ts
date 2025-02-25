@@ -9,15 +9,34 @@ import {
 import { Announcement } from "@prisma/client";
 
 export async function GET(
-  req: NextRequest
+  req: NextRequest,
+  { params }: { params: { id: string } }
 ): Promise<NextResponse<ApiResponse<Announcement[] | null >>> {
   try {
-    const userProfile = await req.json(); // User's profile JSON from request body
+    const { id } = params;
+
+    if (!id) {
+      return NextResponse.json(errorResponse(400, "Id is required"), {
+        status: 400,
+      });
+    }
+
+    const userProfile = await prisma.admin.findUnique({
+      where: {
+        id: String(id),
+      },
+    }) as unknown as { id: string; [key: string]: string | number | boolean | null };
+
+    if (!userProfile) {
+      return NextResponse.json(errorResponse(404, "User profile not found"), {
+        status: 404,
+      });
+    }
 
     const announcements = await prisma.announcement.findMany();
 
     const filteredAnnouncements = announcements.filter((announcement) => {
-      const filter = announcement.filter || {};
+      const filter = typeof announcement.filter === 'string' ? JSON.parse(announcement.filter) : {};
       return Object.entries(filter).every(
         ([key, value]) => userProfile[key] === value
       );
