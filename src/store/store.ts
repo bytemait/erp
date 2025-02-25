@@ -1,13 +1,30 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import userReducer from './slices/userSlice'
 import settingsReducer from './slices/settingsSlice'
+import { persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+
+const persistConfig = {
+    key: "persist-erp",
+    storage,
+    whitelist: ["user", "settings"],
+};
+
+const rootReducer = combineReducers({
+    user: userReducer,
+    settings: settingsReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const makeStore = () => {
     return configureStore({
-        reducer: {
-            user: userReducer,
-            settings: settingsReducer,
-        },
+        reducer: persistedReducer,
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: false,
+            }),
+
     })
 }
 

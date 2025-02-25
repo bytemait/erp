@@ -39,7 +39,7 @@ export function Topnav() {
     useEffect(() => {
         const getUser = async () => {
             const user = await getClientSession();
-            console.log(user)
+            // console.log(user)
             setUser(user);
         }
         getUser();
@@ -88,8 +88,8 @@ export function Topnav() {
                         ))}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() => {
-                                signOut({
+                            onClick={async () => {
+                                await signOut({
                                     redirectTo: "/",
                                 })
                                 dispatch(clearUser());

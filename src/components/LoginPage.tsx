@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import { useAppDispatch } from "@/store/hooks";
 import { setUser } from "@/store/slices/userSlice";
 import axios from "axios";
+// import { getClientSession } from "@/utils/session";
+import { role } from "@/utils/consts";
 
 interface LoginPageProps {
   roles: string[];
@@ -17,6 +19,7 @@ export default function LoginPage({ roles }: LoginPageProps) {
   const dispatch = useAppDispatch();
   const [selectedRole, setSelectedRole] = useState(roles[0] || "Staff");
   const [loading, setLoading] = useState(false);
+  const [msloading, setMsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -26,6 +29,14 @@ export default function LoginPage({ roles }: LoginPageProps) {
         if (!user) return null;
         dispatch(setUser(user.data.data));
         toast.success("Login successful");
+        const userRole = user.data.data.role;
+        if (userRole === role.ADMIN) {
+          window.location.href = '/admin';
+        } else if (userRole === role.STAFF) {
+          window.location.href = '/staff';
+        } else {
+          window.location.href = '/';
+        }
         return null;
       };
       getUserAfterLogin();
@@ -48,20 +59,24 @@ export default function LoginPage({ roles }: LoginPageProps) {
         res = await signIn("admin", {
           email: formValues.userId,
           password: formValues.password,
-          // redirect: false,
-          redirectTo: "/admin",
+          redirect: false,
+          // redirectTo: "/admin",
         });
       } else if (formValues.role === "Staff") {
         res = await signIn("staff", {
           email: formValues.userId,
           password: formValues.password,
-          // redirect: false,
-          redirectTo: "/staff",
+          redirect: false,
+          // redirectTo: "/staff",
         });
       } else {
         toast.error("Invalid Role");
       }
       console.log(res, "res from login");
+
+      if (res?.error === "CredentialsSignin") {
+        toast.error("Invalid Credentials");
+      }
 
       if (res?.ok && res?.error === null) {
         setLoggedIn(true);
@@ -76,16 +91,18 @@ export default function LoginPage({ roles }: LoginPageProps) {
 
   const handleMicrosoftLogin = async () => {
     try {
-      setLoading(true);
+      setMsLoading(true);
       await signIn('microsoft-entra-id', {
         redirect: false,
-      }).then(() => {
-        setLoggedIn(true);
-      });
+      })
+      // const session = await getClientSession();
+      // if (session) {
+      //   setLoggedIn(true);
+      // }
     } catch (error) {
       toast.error(`An error occurred: ${error}`);
     } finally {
-      setLoading(false);
+      setMsLoading(false);
     }
   };
 
@@ -103,10 +120,10 @@ export default function LoginPage({ roles }: LoginPageProps) {
             onClick={handleMicrosoftLogin}
             className="w-full max-w-xs text-lg"
             size="lg"
-            disabled={loading}
+            disabled={msloading}
           >
             <FaMicrosoft color="white" className="mr-2 h-5 w-5" />
-            {loading ? "Logging in..." : "Login with Microsoft"}
+            {msloading ? "Logging in..." : "Login with Microsoft"}
           </Button>
         </div>
 
