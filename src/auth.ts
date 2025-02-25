@@ -120,7 +120,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             data: { email: user.email, name },
                         });
                         await prisma.facultyDetails.create({
-                            data: { facultyId: newUser.id },
+                            data: {
+                                facultyId: { connect: { id: newUser.id } },
+                            },
                         });
                     } else {
                         return false;
@@ -137,7 +139,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         },
                     });
                     if (dbUser) {
-                        await createNotification(dbUser.userId, "Welcome New User!", "You have successfully signed up."); 
+                        await createNotification(dbUser.userId, "Welcome New User!", "You have successfully signed up.");
                     } else {
                         return false;
                     }
