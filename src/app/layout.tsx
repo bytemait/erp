@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import StoreProvider from "@/store/StoreProvider";
+import DebugStore from "@/store/DebugStore";
 
 export const metadata: Metadata = {
   title: "Login | ERP",
@@ -16,11 +18,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Toaster/>
-        {children}
-      </body>
-    </html>
+    <StoreProvider>
+      <html lang="en">
+        <body>
+          <Toaster />
+          <DebugStore />
+          {children}
+        </body>
+      </html>
+    </StoreProvider>
   );
 }

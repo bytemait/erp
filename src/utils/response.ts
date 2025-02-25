@@ -27,3 +27,7 @@ export const failureResponse = (
     status: 500,
     message,
 });
+
+export const error = (message: string): never => {
+    throw new Error(message);
+}

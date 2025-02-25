@@ -1,5 +1,7 @@
+import { User } from "@/types/user";
 import { role } from "./consts";
 import prisma from "./prisma";
+import { error } from "./response";
 
 export const extractRoleByEmail = (email: string): string | null => {
   const [before, after] = email.split("@");
@@ -43,6 +45,18 @@ export const getUserIdByEmail = async (
   return user?.userId;
 };
 
+export const getIdByEmail = async (
+  email: string
+): Promise<string | null> => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!user) return null;
+  return user?.id;
+};
+
 export const getUserRoleByEmail = async (
   email: string
 ): Promise<string | null> => {
@@ -55,39 +69,62 @@ export const getUserRoleByEmail = async (
   return user?.role;
 };
 
-export const getUserByEmail = async (email: string) => {
-  const userId = await getUserIdByEmail(email);
+export const getUserAndChildByEmail = async (email: string): Promise<User> => {
   const userRole = await getUserRoleByEmail(email);
 
-  if (!userId || !role) return null;
+  if (!userRole || !email) error("Credentials not found");
 
-  let userDetails;
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) error("User not found");
+
+  let childDetails;
   if (userRole === role.STUDENT) {
-    userDetails = await prisma.student.findUnique({
+    childDetails = await prisma.student.findUnique({
       where: {
         email: email,
       },
     });
   } else if (userRole === role.ADMIN) {
-    userDetails = await prisma.admin.findUnique({
+    childDetails = await prisma.admin.findUnique({
+      omit: {
+        password: true,
+      },
       where: {
         email: email,
       },
     });
   } else if (userRole === role.FACULTY) {
-    userDetails = await prisma.faculty.findUnique({
+    childDetails = await prisma.faculty.findUnique({
       where: {
         email: email,
       },
     });
   } else if (userRole === role.STAFF) {
-    userDetails = await prisma.staff.findUnique({
+    childDetails = await prisma.staff.findUnique({
+      omit: {
+        password: true,
+      },
       where: {
         email: email,
       },
     });
   } else {
-    return null;
+    error("Invalid Role");
   }
-  return userDetails;
+
+  const userDetails = {
+    id: user?.id,
+    name: user?.name,
+    email: email,
+    mobile: user?.mobile,
+    role: userRole,
+    child: childDetails,
+  };
+
+  return userDetails as User;
 };

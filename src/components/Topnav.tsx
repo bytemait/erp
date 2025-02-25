@@ -16,6 +16,8 @@ import { signOut } from "next-auth/react"
 import { NotificationPanel } from "./NotificationPanel"
 import { getClientSession } from "@/utils/session"
 import { useEffect, useState } from "react"
+import { useAppDispatch } from "@/store/hooks"
+import { clearUser } from "@/store/slices/userSlice"
 
 const profileItems = [
     { name: "Profile", href: "/profile" },
@@ -30,12 +32,14 @@ interface UserType {
 
 export function Topnav() {
 
+    const dispatch = useAppDispatch();
+
     const [user, setUser] = useState<UserType>({ name: "", role: "", email: "" });
 
     useEffect(() => {
         const getUser = async () => {
             const user = await getClientSession();
-            console.log(user)
+            // console.log(user)
             setUser(user);
         }
         getUser();
@@ -84,10 +88,12 @@ export function Topnav() {
                         ))}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={() =>
-                                signOut({
+                            onClick={async () => {
+                                await signOut({
                                     redirectTo: "/",
                                 })
+                                dispatch(clearUser());
+                            }
                             }
                         >
                             Log out

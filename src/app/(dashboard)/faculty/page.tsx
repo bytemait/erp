@@ -1,31 +1,33 @@
 "use client";
 
-import { LayoutDashboard, Book, CreditCard, LineChart, CalendarSearch } from "lucide-react";
-import { Topnav } from "@/components/Topnav";
-import { Sidenav } from "@/components/Sidenav";
 import FacultyPage from "./FacultyPage";
-
-const navItems = [
-  { name: "Dashboard", href: "/faculty", icon: LayoutDashboard },
-  { name: "Courses", href: "/faculty/courses", icon: Book },
-  { name: "Attendance", href: "/faculty/attendance", icon: CalendarSearch },
-  { name: "Assessment", href: "/faculty/attendance", icon: CreditCard },
-  { name: "Reports", href: "/faculty/reports", icon: LineChart },
-];
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useEffect } from "react";
+import { setUser } from "@/store/slices/userSlice";
+import axios from "axios";
 
 export default function Faculty() {
+
+  const dispatch = useAppDispatch();
+  const reduxUser = useAppSelector((state) => state.user);
+
+  useEffect(() => {
+    if (reduxUser.id) return;
+    const getUserAfterLogin = async (): Promise<null> => {
+      const user = await axios.get("/api/public/me");
+      if (!user) return null;
+      dispatch(setUser(user.data.data));
+      return null;
+    };
+    getUserAfterLogin();
+  }, [dispatch, reduxUser.id]);
+
   return (
-    <div className="flex h-screen flex-col">
-      <Topnav />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidenav navItems={navItems} />
-        <main className="flex-1 overflow-y-auto p-4">
-          <h1 className="text-4xl font-bold text-center text-primary pb-10">
-            Faculty Dashboard
-          </h1>
-          <FacultyPage />
-        </main>
-      </div>
-    </div>
+    <main className="flex-1 overflow-y-auto p-4">
+      <h1 className="text-4xl font-bold text-center text-primary pb-10">
+        Faculty Dashboard
+      </h1>
+      <FacultyPage />
+    </main>
   );
 }
