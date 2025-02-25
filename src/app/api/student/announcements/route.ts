@@ -7,13 +7,18 @@ import {
   failureResponse,
 } from "@/utils/response";
 import { Announcement } from "@prisma/client";
+import { getServerToken } from "@/utils/session";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
 ): Promise<NextResponse<ApiResponse<Announcement[] | null >>> {
   try {
-    const { id } = await params;
+    const token = await getServerToken(req);
+    if (!token || !token.id) return NextResponse.json(errorResponse(401, "Unauthorized"), { status: 401 });
+
+    const id = token.id;
+
+    console.log(id);
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), {
@@ -41,7 +46,7 @@ export async function GET(
       const filter = announcement.filter || {};
       // if empty filter, return all announcements
       if (Object.keys(filter).length === 0) {
-        return true;
+        return announcement.role === "STUDENT";
       }
       // role checking
       if (announcement.role !== "STUDENT") {
