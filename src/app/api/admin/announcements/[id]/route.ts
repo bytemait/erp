@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ): Promise<NextResponse<ApiResponse<Announcement[] | null >>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), {
@@ -33,10 +33,20 @@ export async function GET(
       });
     }
 
+    console.log("User Profile:", userProfile);
+
     const announcements = await prisma.announcement.findMany();
 
     const filteredAnnouncements = announcements.filter((announcement) => {
-      const filter = typeof announcement.filter === 'string' ? JSON.parse(announcement.filter) : {};
+      const filter = announcement.filter || {};
+      // if empty filter, return all announcements
+      if (Object.keys(filter).length === 0) {
+        return true;
+      }
+      // role checking
+      if (announcement.role !== "ADMIN") {
+        return false;
+      }
       return Object.entries(filter).every(
         ([key, value]) => userProfile[key] === value
       );
@@ -78,18 +88,13 @@ export async function POST(
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<ApiResponse<Announcement | null>>> {
+
+export async function PATCH(req: NextRequest): Promise<NextResponse<ApiResponse<Announcement | null>>> {
   try {
-    const { id } = params;
-    const data = await req.json();
+    const { id, ...data } = await req.json();
 
     if (!id) {
-      return NextResponse.json(errorResponse(400, "Id is required"), {
-        status: 400,
-      });
+      return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
     }
 
     const updatedAnnouncement = await prisma.announcement.update({
@@ -97,39 +102,27 @@ export async function PATCH(
       data,
     });
 
-    return NextResponse.json(
-      successResponse(200, updatedAnnouncement, "Announcement updated successfully"),
-      { status: 200 }
-    );
+    return NextResponse.json(successResponse(200, updatedAnnouncement, "Announcement updated successfully"), { status: 200 });
   } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(failureResponse(error), { status: 500 });
+    return NextResponse.json(failureResponse(err instanceof Error ? err.message : String(err)), { status: 500 });
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<ApiResponse<null>>> {
+
+export async function DELETE(req: NextRequest): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    const { id } = params;
+    const { id } = await req.json();
 
     if (!id) {
-      return NextResponse.json(errorResponse(400, "Id is required"), {
-        status: 400,
-      });
+      return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
     }
 
     await prisma.announcement.delete({
       where: { id: String(id) },
     });
 
-    return NextResponse.json(
-      successResponse(200, null, "Announcement deleted successfully"),
-      { status: 200 }
-    );
+    return NextResponse.json(successResponse(200, null, "Announcement deleted successfully"), { status: 200 });
   } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(failureResponse(error), { status: 500 });
+    return NextResponse.json(failureResponse(err instanceof Error ? err.message : String(err)), { status: 500 });
   }
 }
