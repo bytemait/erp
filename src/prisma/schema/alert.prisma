@@ -15,6 +15,7 @@ model Announcement {
     message String
     filter  Json?
     role    Role
+    issuer  String @default("error")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
