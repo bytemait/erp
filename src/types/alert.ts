@@ -5,7 +5,7 @@ export interface Announcement {
     title: string
     message: string
     role: Role
-    filters: {
+    filter: {
         batch?: string[]
         group?: string[]
         branch?: string[]

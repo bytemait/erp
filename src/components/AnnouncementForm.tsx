@@ -20,9 +20,11 @@ import { Label } from "@/components/ui/label"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Announcement } from "@/types/alert"
 import { Role } from "@prisma/client"
+import toast from "react-hot-toast"
 
 interface AnnouncementFormProps {
-    initialData?: Announcement
+    initialData?: Announcement,
+    userRole: string
 }
 
 const batchOptions = ["2023", "2024", "2025", "2026"]
@@ -32,14 +34,14 @@ const staffTypeOptions = ["PLACEMENT_OFFICER", "LIBRARIAN", "DEAN"]
 const designationOptions = ["PROFESSOR", "ASSOCIATE_PROFESSOR", "ASSISTANT_PROFESSOR", "LECTURER"]
 const departmentOptions = ["COMPUTER_SCIENCE", "ELECTRONICS", "MECHANICAL", "CIVIL"]
 
-export default function AnnouncementForm({ initialData }: AnnouncementFormProps) {
+export default function AnnouncementForm({ initialData , userRole }: AnnouncementFormProps) {
     const router = useRouter()
     const [formData, setFormData] = useState<Announcement>({
         id: 0,
         title: "",
         message: "",
         role: "STUDENT" as Role,
-        filters: {},
+        filter: {},
     })
     const [showPreview, setShowPreview] = useState(false)
 
@@ -55,13 +57,13 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
     }
 
     const handleRoleChange = (value: Role) => {
-        setFormData((prev) => ({ ...prev, role: value, filters: {} }))
+        setFormData((prev) => ({ ...prev, role: value, filter: {} }))
     }
 
     const handleFilterChange = (filterType: string, values: string[]) => {
         setFormData((prev) => ({
             ...prev,
-            filters: { ...prev.filters, [filterType]: values },
+            filter: { ...prev.filter, [filterType]: values },
         }))
     }
 
@@ -72,8 +74,9 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
 
     const handleConfirm = async () => {
         try {
-            const url = formData.id ? `/api/announcements/${formData.id}` : "/api/announcements"
-            const method = formData.id ? "PUT" : "POST"
+            
+            const url = `/api/${userRole}/announcements`
+            const method = formData.id ? "PATCH" : "POST"
 
             const response = await fetch(url, {
                 method,
@@ -82,11 +85,16 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                 },
                 body: JSON.stringify(formData),
             })
+            
+
+            
 
             if (response.ok) {
-                router.push("/announcements")
+                router.push(`/${userRole}/announcements`)
             } else {
+                toast.error("Failed to save announcement")
                 console.error("Failed to save announcement")
+                
             }
         } catch (error) {
             console.error("Error saving announcement:", error)
@@ -125,7 +133,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Batch</Label>
                             <MultiSelect
                                 options={batchOptions}
-                                selected={formData.filters.batch || []}
+                                selected={formData.filter.batch || []}
                                 onChange={(values) => handleFilterChange("batch", values)}
                             />
                         </div>
@@ -133,7 +141,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Group</Label>
                             <MultiSelect
                                 options={groupOptions}
-                                selected={formData.filters.group || []}
+                                selected={formData.filter.group || []}
                                 onChange={(values) => handleFilterChange("group", values)}
                             />
                         </div>
@@ -141,7 +149,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Branch</Label>
                             <MultiSelect
                                 options={branchOptions}
-                                selected={formData.filters.branch || []}
+                                selected={formData.filter.branch || []}
                                 onChange={(values) => handleFilterChange("branch", values)}
                             />
                         </div>
@@ -153,7 +161,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Staff Type</Label>
                             <MultiSelect
                                 options={staffTypeOptions}
-                                selected={formData.filters.staffType || []}
+                                selected={formData.filter.staffType || []}
                                 onChange={(values) => handleFilterChange("staffType", values)}
                             />
                         </div>
@@ -165,7 +173,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Designation</Label>
                             <MultiSelect
                                 options={designationOptions}
-                                selected={formData.filters.designation || []}
+                                selected={formData.filter.designation || []}
                                 onChange={(values) => handleFilterChange("designation", values)}
                             />
                         </div>
@@ -173,7 +181,7 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <Label>Department</Label>
                             <MultiSelect
                                 options={departmentOptions}
-                                selected={formData.filters.department || []}
+                                selected={formData.filter.department || []}
                                 onChange={(values) => handleFilterChange("department", values)}
                             />
                         </div>
@@ -199,8 +207,8 @@ export default function AnnouncementForm({ initialData }: AnnouncementFormProps)
                             <strong>Role:</strong> {formData.role}
                         </div>
                         <div>
-                            <strong>Filters:</strong>
-                            <pre>{JSON.stringify(formData.filters, null, 2)}</pre>
+                            <strong>filter:</strong>
+                            <pre>{JSON.stringify(formData.filter, null, 2)}</pre>
                         </div>
                     </div>
                     <DialogFooter>

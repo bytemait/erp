@@ -11,17 +11,16 @@ import { createAnnouncementNotifications } from "@/utils/annoucement-notif";
 import { createNotification } from "@/utils/alerts";
 import { getServerToken } from "@/utils/session";
 
+
 export async function GET(
-  req: NextRequest,
-): Promise<NextResponse<ApiResponse<Announcement[] | null >>> {
+  req: NextRequest
+): Promise<NextResponse<ApiResponse<Announcement[] | null>>> {
   try {
     const token = await getServerToken(req);
-    if (!token || !token.id) return NextResponse.json(errorResponse(401, "Unauthorized"), { status: 401 });
+    if (!token || !token.id)
+      return NextResponse.json(errorResponse(401, "Unauthorized"), { status: 401 });
 
     const id = token.id;
-
-    console.log(id);
-
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), {
         status: 400,
@@ -29,9 +28,7 @@ export async function GET(
     }
 
     const userProfile = await prisma.admin.findUnique({
-      where: {
-        id: String(id),
-      },
+      where: { id: String(id) },
     }) as unknown as { id: string; [key: string]: string | number | boolean | null };
 
     if (!userProfile) {
@@ -46,17 +43,19 @@ export async function GET(
 
     const filteredAnnouncements = announcements.filter((announcement) => {
       const filter = announcement.filter || {};
-      // if empty filter, return all announcements
+
+      // If empty filter, return announcements for ADMIN or the issuer
       if (Object.keys(filter).length === 0) {
-        return announcement.role === "ADMIN" || announcement.issuer==id;
+        return announcement.role === "ADMIN" || announcement.issuer === id;
       }
-      // role checking
-      if (announcement.role !== "ADMIN") {
-        return false;
-      }
-      return Object.entries(filter).every(
-        ([key, value]) => userProfile[key] === value
-      );
+
+      // Ensure announcements are included if user matches at least one value in filter
+      const matchesFilter = Object.entries(filter).some(([key, values]) => {
+        if (!Array.isArray(values)) return false; // Ensure values are an array
+        return values.includes(userProfile[key]); // Check if any value matches
+      });
+
+      return matchesFilter || announcement.role === "ADMIN" || announcement.issuer === id;
     });
 
     return NextResponse.json(
@@ -64,8 +63,7 @@ export async function GET(
       { status: 200 }
     );
   } catch (err) {
-    const error = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(failureResponse(error), { status: 500 });
+    return NextResponse.json(failureResponse(err instanceof Error ? err.message : String(err)), { status: 500 });
   }
 }
 

@@ -9,7 +9,7 @@ import { useParams } from "next/navigation"
 async function getAnnouncement(id: string) {
 
 
-    const response = await fetch(`/api/admin/announcements/${id}`)
+    const response = await fetch(`/api/staff/announcements/${id}`)
     const data = await response.json()
     
     
@@ -31,6 +31,6 @@ export default function UpdateAnnouncement() {
         return <div>Loading...</div>
     }
 
-    return <AnnouncementForm userRole="admin" initialData={announcement} />
+    return <AnnouncementForm userRole="staff" initialData={announcement} />
 }
 

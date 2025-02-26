@@ -16,42 +16,41 @@ export async function GET(
 	try {
 		const { id } = await params;
 
-    const token = await getServerToken(req);
+		const token = await getServerToken(req);
 
-    if (!token || !token.id) {
-      return NextResponse.json(errorResponse(401, "Unauthorized"), {
-        status: 401,
-      });
-    }
+		if (!token || !token.id) {
+			return NextResponse.json(errorResponse(401, "Unauthorized"), {
+				status: 401,
+			});
+		}
 
-    const userId = token.id;
-
-
-    
+		const userId = token.id;
 
 		if (!id) {
 			return NextResponse.json(errorResponse(400, "Id is required"), {
 				status: 400,
 			});
 		}
-    const annoucement = await prisma.announcement.findUnique({
-      where: {
-        id: String(id),
-      },
-    });
-    
-		
-    if(!annoucement){
-      return NextResponse.json(errorResponse(404, "Announcement not found"), {
-        status: 404,
-      });
-    }
-    if (annoucement.issuer !== userId) {
-      return NextResponse.json(errorResponse(401, "Access Denied"), {
-        status: 401,
-      });
-    }
-	
+		const annoucement = await prisma.announcement.findUnique({
+			where: {
+				id: String(id),
+			},
+		});
+
+		if (!annoucement) {
+			return NextResponse.json(
+				errorResponse(404, "Announcement not found"),
+				{
+					status: 404,
+				}
+			);
+		}
+		if (annoucement.issuer !== userId) {
+			return NextResponse.json(errorResponse(401, "Access Denied"), {
+				status: 401,
+			});
+		}
+
 		return NextResponse.json(
 			successResponse(
 				200,

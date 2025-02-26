@@ -1,27 +1,71 @@
+'use client'
 import Link from "next/link"
 import { Bell, Megaphone } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useState ,useEffect } from "react"
+import axios from "axios"
 
-const notifications = [
-    { id: 1, title: "New message", description: "You have a new message from John Doe", date: "2023-04-01" },
-    { id: 2, title: "Meeting reminder", description: "Team meeting in 30 minutes", date: "2023-04-02" },
-    {
-        id: 3,
-        title: "Task update",
-        description: "Your task 'Complete project proposal' is due tomorrow",
-        date: "2023-04-03",
-    },
-]
+interface Notification {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+}
 
-const announcements = [
-    { id: 1, title: "System maintenance", description: "Scheduled maintenance on April 15th", date: "2023-04-05" },
-    { id: 2, title: "New feature release", description: "Check out our latest productivity tools", date: "2023-04-06" },
-    { id: 3, title: "Holiday notice", description: "Office will be closed on April 22nd", date: "2023-04-07" },
-]
+interface Announcement {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+}
+
+const getNotifications = async () => {
+    try {
+        
+        const response = await axios.get("/api/public/notification")
+
+        if(!response.data.success){
+            console.error(response.data.message)
+            return []
+        }
+
+        return response.data
+    } catch (error) {
+        console.error(error)
+        
+    }
+}
+const getAnnouncements = async () => {
+    try {
+        const response = await axios.get("/api/student/announcements")
+
+        if(!response.data.success){
+            console.error(response.data.message)
+            return []
+        }
+
+        return response.data
+        
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+
 
 export default function ActivityPage() {
+
+    const[notifications , setNotifications]= useState<Notification[]>([])
+    const[announcements , setAnnouncements]= useState<Announcement[]>([])
+
+    useEffect(() => {
+        getNotifications().then(setNotifications)
+        getAnnouncements().then(setAnnouncements)
+    }, [])
+
+
     return (
         <div className="container mx-auto p-4 max-w-4xl">
             <Tabs defaultValue="notifications">
@@ -30,7 +74,7 @@ export default function ActivityPage() {
                     <TabsTrigger value="announcements">All Announcements</TabsTrigger>
                 </TabsList>
                 <TabsContent value="notifications">
-                    {notifications.map((item) => (
+                    {notifications.length > 0 ? notifications.map((item) => (
                         <ActivityItem
                             key={item.id}
                             icon={<Bell className="h-4 w-4" />}
@@ -38,10 +82,10 @@ export default function ActivityPage() {
                             description={item.description}
                             date={item.date}
                         />
-                    ))}
+                    )) : <p>NOTHING</p>}
                 </TabsContent>
                 <TabsContent value="announcements">
-                    {announcements.map((item) => (
+                    { announcements.length > 0 ? announcements.map((item) => (
                         <ActivityItem
                             key={item.id}
                             icon={<Megaphone className="h-4 w-4" />}
@@ -49,7 +93,7 @@ export default function ActivityPage() {
                             description={item.description}
                             date={item.date}
                         />
-                    ))}
+                    )) : <p>No Announcement</p>}
                 </TabsContent>
             </Tabs>
             <div className="mt-6">
