@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE `Settings` (
+    `id` VARCHAR(191) NOT NULL,
+    `isThemeSelectable` BOOLEAN NOT NULL DEFAULT true,
+    `theme` VARCHAR(191) NOT NULL DEFAULT 'light',
+    `backgroundColor` VARCHAR(191) NOT NULL DEFAULT '#ffffff',
+    `primaryColor` VARCHAR(191) NOT NULL DEFAULT '#1E88E5',
+    `secondaryColor` VARCHAR(191) NOT NULL DEFAULT '#42A5F5',
+    `borderRadius` VARCHAR(191) NOT NULL DEFAULT '4px',
+    `fontSize` ENUM('XS', 'SM', 'BASE', 'LG', 'XL', 'XXL') NOT NULL DEFAULT 'BASE',
+    `fontWeight` ENUM('THIN', 'EXTRA_LIGHT', 'LIGHT', 'NORMAL', 'MEDIUM', 'SEMI_BOLD', 'BOLD', 'EXTRA_BOLD', 'BLACK') NOT NULL DEFAULT 'NORMAL',
+    `headingFont` ENUM('INTER', 'ROBOTO', 'MONTSERRAT', 'POPPINS', 'OPEN_SANS', 'RALEWAY') NOT NULL DEFAULT 'INTER',
+    `textFont` ENUM('INTER', 'ROBOTO', 'MONTSERRAT', 'POPPINS', 'OPEN_SANS', 'RALEWAY') NOT NULL DEFAULT 'OPEN_SANS',
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
