@@ -10,15 +10,15 @@ import axios from "axios"
 interface Notification {
     id: number;
     title: string;
-    description: string;
-    date: string;
+    message: string;
+    createdAt: string;
 }
 
 interface Announcement {
     id: number;
     title: string;
-    description: string;
-    date: string;
+    message: string;
+    createdAt: string;
 }
 
 const getNotifications = async () => {
@@ -26,12 +26,12 @@ const getNotifications = async () => {
         
         const response = await axios.get("/api/public/notification")
 
+    
         if(!response.data.success){
             console.error(response.data.message)
             return []
         }
-
-        return response.data
+        return response.data.data
     } catch (error) {
         console.error(error)
         
@@ -41,12 +41,8 @@ const getAnnouncements = async () => {
     try {
         const response = await axios.get("/api/student/announcements")
 
-        if(!response.data.success){
-            console.error(response.data.message)
-            return []
-        }
-
-        return response.data
+        console.log(response.data)
+        return response.data.data
         
     } catch (error) {
         console.error(error)
@@ -79,8 +75,8 @@ export default function ActivityPage() {
                             key={item.id}
                             icon={<Bell className="h-4 w-4" />}
                             title={item.title}
-                            description={item.description}
-                            date={item.date}
+                            description={item.message}
+                            date={item.createdAt}
                         />
                     )) : <p>NOTHING</p>}
                 </TabsContent>
@@ -90,8 +86,8 @@ export default function ActivityPage() {
                             key={item.id}
                             icon={<Megaphone className="h-4 w-4" />}
                             title={item.title}
-                            description={item.description}
-                            date={item.date}
+                            description={item.message}
+                            date={item.createdAt}
                         />
                     )) : <p>No Announcement</p>}
                 </TabsContent>
@@ -113,13 +109,15 @@ interface ActivityItemProps {
 }
 
 function ActivityItem({ icon, title, description, date }: ActivityItemProps) {
+    
+    const formatedDate = new Date(date).toLocaleDateString()
     return (
         <Card className="mb-4">
             <CardHeader className="flex flex-row items-center gap-4">
                 <div className="bg-primary/10 p-2 rounded-full">{icon}</div>
                 <div>
                     <CardTitle className="text-lg">{title}</CardTitle>
-                    <CardDescription>{date}</CardDescription>
+                    <CardDescription>{formatedDate}</CardDescription>
                 </div>
             </CardHeader>
             <CardContent>
