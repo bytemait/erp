@@ -56,7 +56,7 @@ export async function GET(
         return values.includes(userProfile[key]); // Check if any value matches
       });
 
-      return matchesFilter || announcement.role === "FACULTY" || announcement.issuer === id;
+      return matchesFilter && announcement.role === "FACULTY" && announcement.issuer === id;
     });
 
     return NextResponse.json(
