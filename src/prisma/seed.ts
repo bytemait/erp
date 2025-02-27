@@ -1,7 +1,7 @@
 import prisma from "@/utils/prisma";
 import bcrypt from 'bcryptjs';
 import { env } from "@/utils/consts";
-import { Role } from "@prisma/client";
+import { Role, FontSize, FontWeight, FontType } from "@prisma/client";
 
 const departments = [
   "COMPUTER_SCIENCE_AND_ENGINEERING",
@@ -26,6 +26,19 @@ const staffTypes = [
   "ACCOUNTS_OFFICER",
   "LIBRARIAN",
 ]
+
+const uiSettings = {
+  isThemeSelectable: true,
+  theme: "light", 
+  backgroundColor: "#ffffff", 
+  primaryColor: "#1E88E5", 
+  secondaryColor: "#42A5F5", 
+  borderRadius: "4px", 
+  fontSize: FontSize.BASE, 
+  fontWeight: FontWeight.NORMAL, 
+  headingFont: FontType.INTER, 
+  textFont: FontType.OPEN_SANS, 
+};
 
 async function main() {
   const salt = await bcrypt.genSalt(env.saltRounds);
@@ -93,10 +106,18 @@ async function main() {
       },
     });
   }
+
+  await prisma.settings.upsert({
+    where: { id: "default-settings" }, // You can use a fixed ID or let it auto-generate
+    update: uiSettings,
+    create: uiSettings,
+  });
+
+  console.log("Seeding completed successfully");
 }
 
 main()
-  .catch(e => console.error(e))
+  .catch(e => console.error("Seeding error : ", e))
   .finally(async () => {
     await prisma.$disconnect();
   });
