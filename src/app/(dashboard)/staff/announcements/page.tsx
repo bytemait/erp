@@ -19,7 +19,7 @@ async function getAnnouncements() {
 
     try {
 
-        const response = await fetch("/api/admin/announcements")
+        const response = await fetch("/api/staff/announcements")
         const data = await response.json()
         console.log(data)
         
@@ -59,7 +59,7 @@ export default function AnnouncementsList() {
 
     const confirmDelete = async () => {
         
-        const response = await fetch(`/api/admin/announcements/`, {
+        const response = await fetch(`/api/staff/announcements/`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
