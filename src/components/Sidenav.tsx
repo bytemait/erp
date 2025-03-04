@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutDashboard, FileText, Settings, Check, LucideIcon } from "lucide-react";
+import { Menu, LayoutDashboard, FileText, Settings, Check, LucideIcon, Users, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,6 +13,8 @@ const iconsMap: Record<string, LucideIcon> = {
     FileText,
     Settings,
     Check,
+    Users,
+    Send,
 };
 
 interface NavItem {
@@ -33,7 +35,7 @@ export function Sidenav({ navItems }: SidenavProps) {
         <nav
             className={cn(
                 "flex flex-col border-r transition-all duration-300",
-                isCollapsed ? "w-16" : "w-64"
+                isCollapsed ? "w-16 px-1" : "w-64 px-3"
             )}
         >
             <div className="pb-4">
