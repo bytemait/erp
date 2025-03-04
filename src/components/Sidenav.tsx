@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutDashboard, FileText, Settings, Check, LucideIcon, Users, Send } from "lucide-react";
+import { Menu, LayoutDashboard, FileText, Settings, Check, LucideIcon, Users, Send, Building, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -15,6 +15,8 @@ const iconsMap: Record<string, LucideIcon> = {
     Check,
     Users,
     Send,
+    GraduationCap,
+    Building,
 };
 
 interface NavItem {
