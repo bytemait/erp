@@ -1,0 +1,15 @@
+model Settings {
+  id                String   @id @default(cuid())
+  isThemeSelectable Boolean  @default(true)
+  theme             String   @default("light")
+  backgroundColor   String   @default("#ffffff") 
+  primaryColor      String   @default("#1E88E5") 
+  secondaryColor    String   @default("#42A5F5")
+  borderRadius      String   @default("4px") 
+  fontSize          FontSize @default(BASE)
+  fontWeight        FontWeight @default(NORMAL)
+  headingFont       FontType @default(INTER) 
+  textFont          FontType @default(OPEN_SANS) 
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

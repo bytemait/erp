@@ -41,7 +41,7 @@ export async function GET(
     const filteredAnnouncements = announcements.filter((announcement) => {
       const filter = announcement.filter || {};
 
-      // If empty filter, return announcements for STUDENT or the issuer
+      // If empty filter, return announcements for ADMIN or the issuer
       if (Object.keys(filter).length === 0) {
         return announcement.role === "STUDENT" || announcement.issuer === id;
       }
@@ -52,7 +52,7 @@ export async function GET(
         return values.includes(userProfile[key]); // Check if any value matches
       });
 
-      return matchesFilter && announcement.role === "STUDENT" || announcement.issuer === id;
+      return matchesFilter && announcement.role === "STUDENT" && announcement.issuer === id;
     });
 
     return NextResponse.json(

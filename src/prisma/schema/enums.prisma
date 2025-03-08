@@ -100,3 +100,34 @@ enum BloodGroup1 {
   O_POSITIVE
   O_NEGATIVE
 }
+
+
+enum FontType {
+    INTER
+    ROBOTO
+    MONTSERRAT
+    POPPINS
+    OPEN_SANS
+    RALEWAY
+} 
+
+enum FontSize {
+    XS
+    SM
+    BASE
+    LG
+    XL
+    XXL
+}
+
+enum FontWeight {
+    THIN
+    EXTRA_LIGHT
+    LIGHT
+    NORMAL
+    MEDIUM
+    SEMI_BOLD
+    BOLD
+    EXTRA_BOLD
+    BLACK
+}
