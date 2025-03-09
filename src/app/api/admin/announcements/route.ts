@@ -11,7 +11,6 @@ import { createAnnouncementNotifications } from "@/utils/annoucement-notif";
 import { createNotification } from "@/utils/alerts";
 import { getServerToken } from "@/utils/session";
 
-
 export async function GET(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse<Announcement[] | null>>> {
@@ -44,6 +43,11 @@ export async function GET(
     const filteredAnnouncements = announcements.filter((announcement) => {
       const filter = announcement.filter || {};
 
+      // If isGlobal is true, return the announcement
+      if (announcement.isGlobal) {
+        return true;
+      }
+
       // If empty filter, return announcements for ADMIN or the issuer
       if (Object.keys(filter).length === 0) {
         return announcement.role === "ADMIN" || announcement.issuer === id;
@@ -55,7 +59,7 @@ export async function GET(
         return values.includes(userProfile[key]); // Check if any value matches
       });
 
-      return matchesFilter && announcement.role === "ADMIN" && announcement.issuer === id;
+      return matchesFilter && (announcement.role === "ADMIN" || announcement.issuer === id);
     });
 
     return NextResponse.json(
@@ -76,10 +80,10 @@ export async function POST(
 
     const issuer = token.id;
 
-    const { title, message, filter, role } = await req.json();
-    const data = { title, message, filter, role, issuer: String(issuer) };
+    const { title, message, filter, role, isGlobal } = await req.json();
+    const data = { title, message, filter, role, isGlobal, issuer: String(issuer) };
 
-    if (!title || !message || !role) {
+    if (!title || !message) {
       return NextResponse.json(errorResponse(400, "Missing required fields"), {
         status: 400,
       });
@@ -93,7 +97,10 @@ export async function POST(
       ...announcement,
       filter: announcement.filter as Record<string, string | number | boolean | Date | null>,
     };
-    createAnnouncementNotifications(announcementWithCorrectFilter);
+    createAnnouncementNotifications({
+      ...announcementWithCorrectFilter,
+      role: announcementWithCorrectFilter.role || "defaultRole"
+    });
     createNotification(String(token.id),"You created a new announcement",announcement.title);
     console.log("notification created");
 
