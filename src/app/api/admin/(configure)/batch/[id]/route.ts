@@ -6,7 +6,9 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+type BatchParams = { id: string };
+
+export async function GET(req: NextRequest, { params }: { params: BatchParams }) {
 	try {
 		const { id: batch } = params;
 
@@ -36,7 +38,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 	}
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: BatchParams }) {
 	try {
 		const { id: batch } = params;
 		const body = await req.json();
@@ -80,7 +82,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: BatchParams }) {
 	try {
 		const { id: batch } = params;
 
