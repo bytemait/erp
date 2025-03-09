@@ -62,17 +62,25 @@ model StudentDetails {
   motherOfficeAddress   String?
   guardianName          String?
   board12th             String?
-  yearOf12th            Int?
-  rollno12th            BigInt?
+  // yearOf12th            Int?,
+  // rollno12th            BigInt?
+  yearOf12th            String?
+  rollno12th            String?
   school12th            String?
-  aggregate12th         Decimal?  @db.Decimal(5, 2)
+  // aggregate12th         Decimal?  @db.Decimal(5, 2)
+  aggregate12th         String?  
   board10th             String?
-  yearOf10th            Int?
-  rollno10th            BigInt?
+  // yearOf10th            Int?
+  yearOf10th            String?
+  // rollno10th            BigInt?
+  rollno10th            String?
   school10th            String?
-  aggregate10th         Decimal?  @db.Decimal(5, 2)
-  jeeRank               Int?
-  jeePercentile         Decimal?  @db.Decimal(15, 11)
+  // aggregate10th         Decimal?  @db.Decimal(5, 2)
+  aggregate10th         String?
+  // jeeRank               Int?
+  jeeRank               String?
+  // jeePercentile         Decimal?  @db.Decimal(15, 11)
+  jeePercentile         String?
   jeeRollno             String?   @db.VarChar(12)
   specialAchievements   String?
   passportPhotograph    String?
