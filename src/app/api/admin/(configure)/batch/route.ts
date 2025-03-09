@@ -6,12 +6,10 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-// Helper function for batch validation
 const isValidBatch = (batch: string) => {
 	return /^\d{4}$/.test(batch) && parseInt(batch) > 2000;
 };
 
-// POST request to create a new batch
 export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
@@ -23,7 +21,6 @@ export async function POST(req: NextRequest) {
 			});
 		}
 
-		// Validate batch format
 		if (!isValidBatch(batch)) {
 			return NextResponse.json(
 				errorResponse(400, "Batch must be a valid year (4 digits) after 2000"),
@@ -31,7 +28,6 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		// Check if the batch already exists
 		const batchExists = await prisma.batch.findUnique({ where: { batch } });
 		if (batchExists) {
 			return NextResponse.json(errorResponse(409, "Batch already exists"), {
@@ -39,7 +35,6 @@ export async function POST(req: NextRequest) {
 			});
 		}
 
-		// Create a new batch
 		const newBatch = await prisma.batch.create({
 			data: { batch },
 		});
@@ -55,14 +50,13 @@ export async function POST(req: NextRequest) {
 	}
 }
 
-// GET request to fetch all batches
 export async function GET() {
 	try {
 		const batches = await prisma.batch.findMany({
-			include: { students: true }, // Fetch associated students
+			include: { students: true },
 		});
 
-		if (!batches || batches.length === 0) {
+		if (!batches) {
 			return NextResponse.json(errorResponse(404, "No batches found"), {
 				status: 404,
 			});

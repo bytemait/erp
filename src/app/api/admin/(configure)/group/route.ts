@@ -59,7 +59,10 @@ export async function POST(req: NextRequest) {
 export async function GET() {
 	try {
 		const groups = await prisma.group.findMany({
-			include: { students: true }, // Fetch associated students
+			select: {
+				group: true,
+				students: true,
+			},
 		});
 
 		if (!groups || groups.length === 0) {

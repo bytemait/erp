@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { useAppSelector } from "@/store/hooks"
 
 interface Notifications {
     id: number;
@@ -19,7 +20,7 @@ interface Notifications {
 export function NotificationPanel() {
 
     const [notifications, setNotifications] = useState<Notifications[]>([])
-
+    const user = useAppSelector(state => state.user)
 
     useEffect(() => {
         const getNotifications = async () => {
@@ -47,7 +48,7 @@ export function NotificationPanel() {
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href="/activity" className="w-full text-center">
+                <Link href={`/${user.role ? user.role.toLowerCase() : "activity"}/activity`} className="w-full text-center">
                     View all notifications
                 </Link>
             </DropdownMenuItem>

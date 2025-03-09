@@ -1,45 +1,67 @@
 "use client"
+
 import { Menucard } from "@/components/Menucard";
-import { Mail, Calendar, CreditCard, LineChart , User} from "lucide-react"
+import { Users, Send, Check, Settings } from "lucide-react"
 
 export default function AdminPage() {
 
     const functionCards = [
         {
-            title: "Email",
-            description: "Manage your email communications",
-            icon: Mail,
+            title: "User Management",
+            description: "Manage your users and their roles",
+            icon: Users,
             color: "bg-slate-500",
-            route: "/admin/email"
+            route: "admin/users"
         },
         {
-            title: "Calendar",
-            description: "Schedule and manage your events",
-            icon: Calendar,
+            title: "Send Announcement",
+            description: "Send an announcement to users",
+            icon: Send,
             color: "bg-slate-500",
-            route: "/admin/calendar"
+            route: "admin/announcements"
         },
         {
-            title: "Invoices",
-            description: "Create and manage your invoices",
-            icon: CreditCard,
+            title: "Configure",
+            description: "Configure your application structure",
+            icon: Check,
             color: "bg-slate-500",
-            route: "/admin/invoices"
+            route: "admin/configure"
         },
         {
-            title: "Analytics",
-            description: "View detailed analytics and reports",
-            icon: LineChart,
+            title: "UI Settings",
+            description: "Manage your application UI settings",
+            icon: Settings,
             color: "bg-slate-500",
-            route: "/admin/analytics"
+            route: "admin/uisettings"
         },
-        {
-            title :"User Management",
-            description :"Manage your users and their roles",
-            icon : User,
-            color : "bg-slate-500",
-            route : "admin/users"
-        }
+        // {
+        //     title: "Email",
+        //     description: "Manage your email communications",
+        //     icon: Mail,
+        //     color: "bg-slate-500",
+        //     route: "/admin/email"
+        // },
+        // {
+        //     title: "Calendar",
+        //     description: "Schedule and manage your events",
+        //     icon: Calendar,
+        //     color: "bg-slate-500",
+        //     route: "/admin/calendar"
+        // },
+        // {
+        //     title: "Invoices",
+        //     description: "Create and manage your invoices",
+        //     icon: CreditCard,
+        //     color: "bg-slate-500",
+        //     route: "/admin/invoices"
+        // },
+        // {
+        //     title: "Analytics",
+        //     description: "View detailed analytics and reports",
+        //     icon: LineChart,
+        //     color: "bg-slate-500",
+        //     route: "/admin/analytics"
+        // },
     ]
 
     return (

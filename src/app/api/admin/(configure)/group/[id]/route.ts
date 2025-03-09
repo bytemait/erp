@@ -6,10 +6,9 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-// GET request to fetch a specific group by name
-export async function GET({ params }: { params: { group: string } }) {
+export async function GET({ params }: { params: { id: string } }) {
 	try {
-		const { group } = params;
+		const { id: group } = params;
 
 		if (!group) {
 			return NextResponse.json(errorResponse(400, "Group name is required"), {
@@ -19,7 +18,7 @@ export async function GET({ params }: { params: { group: string } }) {
 
 		const groupData = await prisma.group.findUnique({
 			where: { group },
-			include: { students: true }, // Include students in the response
+			include: { students: true },
 		});
 
 		if (!groupData) {
@@ -37,22 +36,14 @@ export async function GET({ params }: { params: { group: string } }) {
 	}
 }
 
-// PUT request to update group details
-export async function PUT(req: NextRequest, { params }: { params: { group: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { group } = params;
+		const { id: group } = params;
 		const body = await req.json();
-		const { newGroupName } = body;
+		const { group: newGroupName } = body;
 
 		if (!group || !newGroupName) {
 			return NextResponse.json(errorResponse(400, "Both old and new group names are required"), {
-				status: 400,
-			});
-		}
-
-		// Validate new group format (max 5 characters)
-		if (newGroupName.length > 5) {
-			return NextResponse.json(errorResponse(400, "Group name must be at most 5 characters long"), {
 				status: 400,
 			});
 		}
@@ -61,6 +52,15 @@ export async function PUT(req: NextRequest, { params }: { params: { group: strin
 		if (!groupExists) {
 			return NextResponse.json(errorResponse(404, "Group not found"), {
 				status: 404,
+			});
+		}
+
+		const newGroupExists = await prisma.group.findUnique({
+			where: { group: newGroupName }
+		});
+		if (newGroupExists && newGroupName !== group) {
+			return NextResponse.json(errorResponse(409, "Group already exists"), {
+				status: 409,
 			});
 		}
 
@@ -79,10 +79,9 @@ export async function PUT(req: NextRequest, { params }: { params: { group: strin
 	}
 }
 
-// DELETE request to delete a group
-export async function DELETE(req: NextRequest, { params }: { params: { group: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { group } = params;
+		const { id: group } = params;
 
 		if (!group) {
 			return NextResponse.json(errorResponse(400, "Group name is required"), {
@@ -90,11 +89,22 @@ export async function DELETE(req: NextRequest, { params }: { params: { group: st
 			});
 		}
 
-		const groupExists = await prisma.group.findUnique({ where: { group } });
+		const groupExists = await prisma.group.findUnique({
+			where: { group },
+			include: { students: true }
+		});
+
 		if (!groupExists) {
 			return NextResponse.json(errorResponse(404, "Group not found"), {
 				status: 404,
 			});
+		}
+
+		if (groupExists.students.length > 0) {
+			return NextResponse.json(
+				errorResponse(400, "Cannot delete group with associated students"),
+				{ status: 400 }
+			);
 		}
 
 		await prisma.group.delete({ where: { group } });

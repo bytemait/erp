@@ -4,9 +4,11 @@ import { Topnav } from "@/components/Topnav";
 import { Sidenav } from "@/components/Sidenav";
 
 const navItems = [
-	{ name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-	{ name: "Documents", href: "/documents", icon: "FileText" },
-	{ name: "Settings", href: "/settings", icon: "Settings" },
+	{ name: "Home", href: "/admin", icon: "LayoutDashboard" },
+	{ name: "Users", href: "/admin/users", icon: "Users" },
+	{ name: "Announcements", href: "/admin/announcements", icon: "Send" }, 
+	{ name: "Configure", href: "/admin/configure", icon: "Check" },
+	{ name: "UI Settings", href: "/documents", icon: "Settings" }
 ];
 
 export const metadata: Metadata = {

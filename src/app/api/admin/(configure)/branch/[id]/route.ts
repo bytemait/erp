@@ -6,10 +6,9 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-// GET request 
-export async function GET({ params }: { params: { branch: string } }) {
+export async function GET({ params }: { params: { id: string } }) {
 	try {
-		const { branch } = params;
+		const { id: branch } = params;
 
 		if (!branch) {
 			return NextResponse.json(errorResponse(400, "Branch name is required"), {
@@ -19,7 +18,7 @@ export async function GET({ params }: { params: { branch: string } }) {
 
 		const branchData = await prisma.branch.findUnique({
 			where: { branch },
-			include: { students: true }, 
+			include: { students: true },
 		});
 
 		if (!branchData) {
@@ -37,12 +36,11 @@ export async function GET({ params }: { params: { branch: string } }) {
 	}
 }
 
-// PUT request 
-export async function PUT(req: NextRequest, { params }: { params: { branch: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { branch } = params;
+		const { id: branch } = params;
 		const body = await req.json();
-		const { newBranchName } = body;
+		const { branch: newBranchName } = body;
 
 		if (!branch || !newBranchName) {
 			return NextResponse.json(errorResponse(400, "Both old and new branch names are required"), {
@@ -54,6 +52,15 @@ export async function PUT(req: NextRequest, { params }: { params: { branch: stri
 		if (!branchExists) {
 			return NextResponse.json(errorResponse(404, "Branch not found"), {
 				status: 404,
+			});
+		}
+
+		const newBranchExists = await prisma.branch.findUnique({
+			where: { branch: newBranchName }
+		});
+		if (newBranchExists && newBranchName !== branch) {
+			return NextResponse.json(errorResponse(409, "Branch already exists"), {
+				status: 409,
 			});
 		}
 
@@ -72,10 +79,9 @@ export async function PUT(req: NextRequest, { params }: { params: { branch: stri
 	}
 }
 
-// DELETE request to delete a branch
-export async function DELETE(req: NextRequest, { params }: { params: { branch: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { branch } = params;
+		const { id: branch } = params;
 
 		if (!branch) {
 			return NextResponse.json(errorResponse(400, "Branch name is required"), {
@@ -83,11 +89,22 @@ export async function DELETE(req: NextRequest, { params }: { params: { branch: s
 			});
 		}
 
-		const branchExists = await prisma.branch.findUnique({ where: { branch } });
+		const branchExists = await prisma.branch.findUnique({
+			where: { branch },
+			include: { students: true }
+		});
+
 		if (!branchExists) {
 			return NextResponse.json(errorResponse(404, "Branch not found"), {
 				status: 404,
 			});
+		}
+
+		if (branchExists.students.length > 0) {
+			return NextResponse.json(
+				errorResponse(400, "Cannot delete branch with associated students"),
+				{ status: 400 }
+			);
 		}
 
 		await prisma.branch.delete({ where: { branch } });

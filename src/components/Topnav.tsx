@@ -19,11 +19,6 @@ import { useEffect, useState } from "react"
 import { useAppDispatch } from "@/store/hooks"
 import { clearUser } from "@/store/slices/userSlice"
 
-const profileItems = [
-    { name: "Profile", href: "/profile" },
-    { name: "Settings", href: "/settings" },
-]
-
 interface UserType {
     name: string;
     role: string;
@@ -35,6 +30,11 @@ export function Topnav() {
     const dispatch = useAppDispatch();
 
     const [user, setUser] = useState<UserType>({ name: "", role: "", email: "" });
+
+    const profileItems = [
+        { name: "Profile", href: `/${user.role.toLowerCase()}/profile` },
+        { name: "Settings", href: `/${user.role.toLowerCase()}/settings` },
+    ]
 
     useEffect(() => {
         const getUser = async () => {
@@ -74,10 +74,10 @@ export function Topnav() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
                         <DropdownMenuLabel className="font-normal">
-                            <div className="flex flex-col space-y-1">
-                                <p className="text-sm font-medium leading-none">{user.name || "-"}</p>
-                                <p className="text-xs leading-none text-muted-foreground">{user.email || "-"}</p>
-                                <p className="text-xs">{user.role || "-"}</p>
+                            <div className="flex flex-col space-y-3">
+                                {/* <p className="text-sm font-medium leading-none">{user.name || "-"}</p> */}
+                                <p className="text-sm font-medium leading-none">{user.email || "-"}</p>
+                                <p className="text-xs leading-none text-muted-foreground">{user.role || "-"}</p>
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />

@@ -16,12 +16,12 @@ model Batch {
 }
 
 model Branch {
-  branch  String    @id
+  branch   String    @id
   students Student[]
 }
 
 model Group {
-  group   String    @id
+  group    String    @id
   students Student[]
 }
 
