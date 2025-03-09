@@ -92,7 +92,7 @@ model InterviewSchedule {
 
     interviewSlots InterviewSlot[]
 
-    jobListing JobListing @relation(fields: [jobListingId], references: [id])
+    jobListing JobListing @relation(fields: [jobListingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model InterviewSlot {

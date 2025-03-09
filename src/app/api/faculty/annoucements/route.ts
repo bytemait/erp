@@ -11,8 +11,6 @@ import { createAnnouncementNotifications } from "@/utils/annoucement-notif";
 import { createNotification } from "@/utils/alerts";
 import { getServerToken } from "@/utils/session";
 
-
-
 export async function GET(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse<Announcement[] | null>>> {
@@ -45,7 +43,12 @@ export async function GET(
     const filteredAnnouncements = announcements.filter((announcement) => {
       const filter = announcement.filter || {};
 
-      // If empty filter, return announcements for ADMIN or the issuer
+      // If isGlobal is true, return the announcement
+      if (announcement.isGlobal) {
+        return true;
+      }
+
+      // If empty filter, return announcements for FACULTY or the issuer
       if (Object.keys(filter).length === 0) {
         return announcement.role === "FACULTY" || announcement.issuer === id;
       }
@@ -56,7 +59,7 @@ export async function GET(
         return values.includes(userProfile[key]); // Check if any value matches
       });
 
-      return matchesFilter && announcement.role === "FACULTY" && announcement.issuer === id;
+      return matchesFilter && (announcement.role === "FACULTY" || announcement.issuer === id);
     });
 
     return NextResponse.json(
@@ -68,7 +71,6 @@ export async function GET(
   }
 }
 
-
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<ApiResponse<Announcement | null>>> {
@@ -78,8 +80,14 @@ export async function POST(
 
     const issuer = token.id;
 
-    const { title, message, filter, role } = await req.json();
-    const data = { title, message, filter, role, issuer: String(issuer) };
+    const { title, message, filter, role, isGlobal } = await req.json();
+    const data = { title, message, filter, role, isGlobal, issuer: String(issuer) };
+    if (isGlobal)
+    {
+      return NextResponse.json(errorResponse(400, "Global announcements are not allowed"), {
+        status: 400,
+      });
+    }
 
     if (!title || !message || !role) {
       return NextResponse.json(errorResponse(400, "Missing required fields"), {
@@ -87,9 +95,8 @@ export async function POST(
       });
     }
 
-    if (data.role!=="STUDENT" && data.role!=="FACULTY")
-    {
-      return NextResponse.json(errorResponse(400,"Missing permission"),{status:400});
+    if (data.role !== "STUDENT" && data.role !== "FACULTY") {
+      return NextResponse.json(errorResponse(400, "Missing permission"), { status: 400 });
     }
 
     const announcement = await prisma.announcement.create({
@@ -100,8 +107,11 @@ export async function POST(
       ...announcement,
       filter: announcement.filter as Record<string, string | number | boolean | Date | null>,
     };
-    createAnnouncementNotifications(announcementWithCorrectFilter);
-    createNotification(String(token.id),"You created a new announcement",announcement.title);
+    createAnnouncementNotifications({
+      ...announcementWithCorrectFilter,
+      role: announcementWithCorrectFilter.role || "defaultRole"
+    });
+    createNotification(String(token.id), "You created a new announcement", announcement.title);
     console.log("notification created");
 
     return NextResponse.json(
@@ -116,7 +126,6 @@ export async function POST(
 
 export async function PATCH(req: NextRequest): Promise<NextResponse<ApiResponse<Announcement | null>>> {
   try {
-
     const token = await getServerToken(req);
     if (!token || !token.id) return NextResponse.json(errorResponse(401, "Unauthorized"), { status: 401 });
 
@@ -126,18 +135,16 @@ export async function PATCH(req: NextRequest): Promise<NextResponse<ApiResponse<
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
     }
 
-    const findAnnoucement = await prisma.announcement.findUnique({
-      where: {id : String(id)}
-    })
+    const findAnnouncement = await prisma.announcement.findUnique({
+      where: { id: String(id) },
+    });
 
-    if (!findAnnoucement)
-    {
-      return NextResponse.json(errorResponse(400,"Announcement not found"),{status: 400});
+    if (!findAnnouncement) {
+      return NextResponse.json(errorResponse(400, "Announcement not found"), { status: 400 });
     }
 
-    if (findAnnoucement.issuer!==token.id)
-    {
-      return NextResponse.json(errorResponse(400,"This annoucement was not issued by you"),{status:400});
+    if (findAnnouncement.issuer !== token.id) {
+      return NextResponse.json(errorResponse(400, "This announcement was not issued by you"), { status: 400 });
     }
 
     const updatedAnnouncement = await prisma.announcement.update({
@@ -162,18 +169,16 @@ export async function DELETE(req: NextRequest): Promise<NextResponse<ApiResponse
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
     }
 
-    const findAnnoucement = await prisma.announcement.findUnique({
-      where: {id : String(id)}
-    })
+    const findAnnouncement = await prisma.announcement.findUnique({
+      where: { id: String(id) },
+    });
 
-    if (!findAnnoucement)
-    {
-      return NextResponse.json(errorResponse(400,"Announcement not found"),{status: 400});
+    if (!findAnnouncement) {
+      return NextResponse.json(errorResponse(400, "Announcement not found"), { status: 400 });
     }
 
-    if (findAnnoucement.issuer!==token.id)
-    {
-      return NextResponse.json(errorResponse(400,"This annoucement was not issued by you"),{status:400});
+    if (findAnnouncement.issuer !== token.id) {
+      return NextResponse.json(errorResponse(400, "This announcement was not issued by you"), { status: 400 });
     }
 
     await prisma.announcement.delete({
