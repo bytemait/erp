@@ -27,17 +27,36 @@ const staffTypes = [
   "LIBRARIAN",
 ]
 
+const batches = [
+  "2025",
+  "2026",
+  "2027",
+]
+
+const branches = [
+  "COMPUTER_SCIENCE_AND_ENGINEERING",
+  "INFORMATION_TECHNOLOGY",
+  "ELECTRONICS_AND_COMMUNICATION_ENGINEERING",
+  "MECHANICAL_AND_AUTOMATION_ENGINEERING",
+]
+
+const groups = [
+  "5C12",
+  "6C12",
+  "K1",
+]
+
 const uiSettings = {
   isThemeSelectable: true,
-  theme: "light", 
-  backgroundColor: "#ffffff", 
-  primaryColor: "#1E88E5", 
-  secondaryColor: "#42A5F5", 
-  borderRadius: "4px", 
-  fontSize: FontSize.BASE, 
-  fontWeight: FontWeight.NORMAL, 
-  headingFont: FontType.INTER, 
-  textFont: FontType.OPEN_SANS, 
+  theme: "light",
+  backgroundColor: "#ffffff",
+  primaryColor: "#1E88E5",
+  secondaryColor: "#42A5F5",
+  borderRadius: "4px",
+  fontSize: FontSize.BASE,
+  fontWeight: FontWeight.NORMAL,
+  headingFont: FontType.INTER,
+  textFont: FontType.OPEN_SANS,
 };
 
 async function main() {
@@ -103,6 +122,42 @@ async function main() {
       update: {},
       create: {
         staffType: staffType,
+      },
+    });
+  }
+
+  for (const batch of batches) {
+    await prisma.batch.upsert({
+      where: {
+        batch: batch,
+      },
+      update: {},
+      create: {
+        batch: batch,
+      },
+    });
+  }
+
+  for (const branch of branches) {
+    await prisma.branch.upsert({
+      where: {
+        branch: branch
+      },
+      update: {},
+      create: {
+        branch: branch,
+      },
+    });
+  }
+
+  for (const group of groups) {
+    await prisma.group.upsert({
+      where: {
+        group: group,
+      },
+      update: {},
+      create: {
+        group: group,
       },
     });
   }

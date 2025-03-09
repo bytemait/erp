@@ -6,10 +6,9 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-// GET request to fetch a specific batch by name
-export async function GET({ params }: { params: { batch: string } }) {
+export async function GET({ params }: { params: { id: string } }) {
 	try {
-		const { batch } = params;
+		const { id: batch } = params;
 
 		if (!batch) {
 			return NextResponse.json(errorResponse(400, "Batch name is required"), {
@@ -19,7 +18,7 @@ export async function GET({ params }: { params: { batch: string } }) {
 
 		const batchData = await prisma.batch.findUnique({
 			where: { batch },
-			include: { students: true }, // Include students in the response
+			include: { students: true },
 		});
 
 		if (!batchData) {
@@ -37,12 +36,15 @@ export async function GET({ params }: { params: { batch: string } }) {
 	}
 }
 
-// PUT request to update batch details
-export async function PUT(req: NextRequest, { params }: { params: { batch: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { batch } = params;
+		const { id: batch } = params;
 		const body = await req.json();
-		const { newBatchName } = body;
+		const { batch: newBatchName } = body;
+
+		console.log(params)
+
+		console.log(batch, newBatchName);
 
 		if (!batch || !newBatchName) {
 			return NextResponse.json(errorResponse(400, "Both old and new batch names are required"), {
@@ -50,7 +52,6 @@ export async function PUT(req: NextRequest, { params }: { params: { batch: strin
 			});
 		}
 
-		// Validate new batch format
 		if (!/^\d{4}$/.test(newBatchName) || parseInt(newBatchName) <= 2000) {
 			return NextResponse.json(errorResponse(400, "Batch must be a valid year after 2000"), {
 				status: 400,
@@ -79,10 +80,9 @@ export async function PUT(req: NextRequest, { params }: { params: { batch: strin
 	}
 }
 
-// DELETE request to delete a batch
-export async function DELETE(req: NextRequest, { params }: { params: { batch: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
 	try {
-		const { batch } = params;
+		const { id: batch } = params;
 
 		if (!batch) {
 			return NextResponse.json(errorResponse(400, "Batch name is required"), {

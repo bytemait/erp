@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
 export async function GET() {
 	try {
 		const branches = await prisma.branch.findMany({
-			include: { students: true }, 
+			select: {
+				branch: true,
+				students: true,
+			},
 		});
 
 		if (!branches || branches.length === 0) {

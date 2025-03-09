@@ -25,7 +25,7 @@ export default function AdminPage() {
             description: "Configure your application structure",
             icon: Check,
             color: "bg-slate-500",
-            route: "admin/uisettings"
+            route: "admin/configure"
         },
         {
             title: "UI Settings",
