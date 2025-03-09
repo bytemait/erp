@@ -6,7 +6,7 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
 	try {
 		const { id: batch } = params;
 
@@ -80,7 +80,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
 	try {
 		const { id: batch } = params;
 
