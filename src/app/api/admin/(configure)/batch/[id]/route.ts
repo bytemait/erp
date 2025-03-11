@@ -1,3 +1,5 @@
+export const runtime = "nodejs"
+
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/prisma";
 import {
@@ -5,10 +7,15 @@ import {
 	successResponse,
 	failureResponse,
 } from "@/utils/response";
+// import { Batch } from "@prisma/client";
+// import { ApiResponse } from "@/types/apiResponse";
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }
+){
 	try {
-		const { id: batch } = params;
+		const { id: batch } = await params
 
 		if (!batch) {
 			return NextResponse.json(errorResponse(400, "Batch name is required"), {
@@ -36,14 +43,16 @@ export async function GET({ params }: { params: { id: string } }) {
 	}
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }
+){
 	try {
-		const { id: batch } = params;
+		const { id: batch } = await params;
 		const body = await req.json();
 		const { batch: newBatchName } = body;
 
 		console.log(params)
-
 		console.log(batch, newBatchName);
 
 		if (!batch || !newBatchName) {
@@ -80,9 +89,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }
+){
 	try {
-		const { id: batch } = params;
+		const { id: batch } = await params;
 
 		if (!batch) {
 			return NextResponse.json(errorResponse(400, "Batch name is required"), {

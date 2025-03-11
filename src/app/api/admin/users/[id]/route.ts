@@ -9,9 +9,10 @@ import {
 
 
 // GET request to fetch user profile
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         if (!id) {
             return NextResponse.json(errorResponse(400, "ID is required"), {
@@ -54,10 +55,12 @@ export async function GET({ params }: { params: { id: string } }) {
 }
 
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
-        const body = await req.json();
+
+        const body = await request.json();
         const { username, email, role } = body;
 		console.log(body);
         if (!id) {
@@ -153,7 +156,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE request to delete a user
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest,
+      { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
 
