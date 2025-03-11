@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/prisma";
-import { ApiResponse } from "@/types/apiResponse";
 import {
   errorResponse,
   successResponse,
   failureResponse,
 } from "@/utils/response";
-import { Announcement } from "@prisma/client";
 import { getServerToken } from "@/utils/session";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<ApiResponse<Announcement | null>>> {
+  request: NextRequest,
+      { params }: { params: Promise<{ id: string }> }
+){
   try {
-    const { id } = params;
+    const { id } = await params;
 
-    const token = await getServerToken(req);
+    const token = await getServerToken(request);
 
     if (!token || !token.id) {
       return NextResponse.json(errorResponse(401, "Unauthorized"), {

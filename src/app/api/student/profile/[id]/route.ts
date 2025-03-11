@@ -13,9 +13,10 @@ function serializeBigInt<T>(obj: T): T {
   );
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<Student | null>>> {
+export async function GET(req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }): Promise<NextResponse<ApiResponse<Student | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
@@ -41,9 +42,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<Student | null>>> {
+export async function PATCH(req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }): Promise<NextResponse<ApiResponse<Student | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await req.json();
     const email = data.email;
     const enrollment = data.enrollmentNo;
@@ -113,9 +115,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<null>>> {
+export async function DELETE(req: NextRequest,
+	{ params }: { params: Promise<{ id : string }> }): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "id is required"), { status: 400 });
