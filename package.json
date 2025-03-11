@@ -13,7 +13,8 @@
     "push": "npx prisma db push",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
-    "seed": "npx prisma db seed"
+    "seed": "npx prisma db seed",
+    "preinstall": "npm config set legacy-peer-deps true"
   },
   "prisma": {
     "schema": "src/prisma/schema",
