@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/prisma";
 import {
     errorResponse,
@@ -7,12 +7,14 @@ import {
 } from "@/utils/response";
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
+     request: NextRequest,
+      { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: staffTypeId } = await params;
+
         const staffType = await prisma.staffType.findFirst({
-            where: { staffType: params.id },
+            where: { staffType: staffTypeId },
         });
 
         if (!staffType) {
@@ -33,10 +35,12 @@ export async function GET(
 }
 
 export async function PUT(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+      { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: staffTypeId } = await params;
+
         const body = await request.json();
         const { stafftype } = body;
 
@@ -50,14 +54,14 @@ export async function PUT(
             where: { staffType: stafftype },
         });
 
-        if (existingStaffType && existingStaffType.staffType !== params.id) {
+        if (existingStaffType && existingStaffType.staffType !== staffTypeId) {
             return NextResponse.json(errorResponse(409, "Staff type already exists"), {
                 status: 409,
             });
         }
 
         const updatedStaffType = await prisma.staffType.update({
-            where: { staffType: params.id },
+            where: { staffType: staffTypeId },
             data: { staffType: stafftype },
         });
 
@@ -73,12 +77,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: staffTypeId } = await params;
+
         const staffType = await prisma.staffType.findFirst({
-            where: { staffType: params.id },
+            where: { staffType: staffTypeId },
         });
 
         if (!staffType) {
@@ -88,7 +94,7 @@ export async function DELETE(
         }
 
         await prisma.staffType.delete({
-            where: { staffType: params.id },
+            where: { staffType: staffTypeId },
         });
 
         return NextResponse.json(

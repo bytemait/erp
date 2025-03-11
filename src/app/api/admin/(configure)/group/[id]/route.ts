@@ -6,9 +6,10 @@ import {
 	failureResponse,
 } from "@/utils/response";
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET( request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id: group } = params;
+		const { id: group } = await params;
 
 		if (!group) {
 			return NextResponse.json(errorResponse(400, "Group name is required"), {
@@ -36,10 +37,12 @@ export async function GET({ params }: { params: { id: string } }) {
 	}
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT( request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id: group } = params;
-		const body = await req.json();
+		const { id: group } = await params;
+
+		const body = await request.json();
 		const { group: newGroupName } = body;
 
 		if (!group || !newGroupName) {
@@ -79,9 +82,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE( request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id: group } = params;
+		const { id: group } = await params;
 
 		if (!group) {
 			return NextResponse.json(errorResponse(400, "Group name is required"), {
