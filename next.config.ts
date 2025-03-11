@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
   //   ignoreBuildErrors: true,
   // },
   reactStrictMode: false,
+  serverRuntimeConfig:{
+    runtime: "nodejs"
+  },
+  serverExternalPackages: ['bcryptjs', 'crypto'],
+  experimental: {
+    nodeMiddleware: true,
+  },
 };
 
 export default nextConfig;
