@@ -1,0 +1,34 @@
+enum ItemCondition {
+    WORKING
+    BROKEN
+    LOST
+    DISPOSED
+}
+
+model InfraItem {
+    id             String        @id @default(cuid())
+    itemCode       String        @unique
+    ItemTypeId     String?
+    RoomTypeId     String?
+    departmentId   String?
+    roomNumber     String?
+    yearOfPurchase String?
+    status         ItemCondition @default(WORKING)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    department Department? @relation(fields: [departmentId], references: [department], onDelete: SetNull, onUpdate: Cascade)
+    ItemType   ItemType?   @relation(fields: [ItemTypeId], references: [item], onDelete: SetNull, onUpdate: Cascade)
+    RoomType   RoomType?   @relation(fields: [RoomTypeId], references: [room], onDelete: SetNull, onUpdate: Cascade)
+}
+
+model ItemType {
+    item      String      @id
+    InfraItem InfraItem[]
+}
+
+model RoomType {
+    room      String      @id
+    InfraItem InfraItem[]
+}
