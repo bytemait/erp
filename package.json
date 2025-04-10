@@ -39,7 +39,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
     "lucide-react": "^0.474.0",
-    "next": "^15.3.0-canary.43",
+    "next": "^15.3.1-canary.0",
     "next-auth": "^5.0.0-beta.25",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
