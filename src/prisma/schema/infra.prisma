@@ -6,21 +6,32 @@ enum ItemCondition {
 }
 
 model InfraItem {
-    id             String        @id @default(cuid())
-    itemCode       String        @unique
+    id             String            @id @default(cuid())
     ItemTypeId     String?
     RoomTypeId     String?
     departmentId   String?
     roomNumber     String?
     yearOfPurchase String?
-    status         ItemCondition @default(WORKING)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    itemCodes      ItemCodeStatus[]  // new change
+    createdAt      DateTime          @default(now())
+    updatedAt      DateTime          @updatedAt
 
-    department Department? @relation(fields: [departmentId], references: [department], onDelete: SetNull, onUpdate: Cascade)
-    ItemType   ItemType?   @relation(fields: [ItemTypeId], references: [item], onDelete: SetNull, onUpdate: Cascade)
-    RoomType   RoomType?   @relation(fields: [RoomTypeId], references: [room], onDelete: SetNull, onUpdate: Cascade)
+    department     Department?       @relation(fields: [departmentId], references: [department], onDelete: SetNull, onUpdate: Cascade)
+    ItemType       ItemType?         @relation(fields: [ItemTypeId], references: [item], onDelete: SetNull, onUpdate: Cascade)
+    RoomType       RoomType?         @relation(fields: [RoomTypeId], references: [room], onDelete: SetNull, onUpdate: Cascade)
+}
+
+model ItemCodeStatus {
+    id        String        @id @default(cuid())
+    itemCode  String        @unique
+    status    ItemCondition @default(WORKING)
+
+    infraItemId String
+    infraItem   InfraItem    @relation(fields: [infraItemId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+    createdAt  DateTime      @default(now())
+    updatedAt  DateTime      @updatedAt
 }
 
 model ItemType {

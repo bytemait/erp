@@ -25,6 +25,7 @@ const staffTypes = [
   "PLACEMENT_OFFICER",
   "ACCOUNTS_OFFICER",
   "LIBRARIAN",
+  "INFRA-INCHARGE",
 ]
 
 const batches = [
