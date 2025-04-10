@@ -6,8 +6,9 @@ model Designation {
 }
 
 model Department {
-  department String    @id
+  department String      @id
   faculties  Faculty[]
+  infraItems InfraItem[]
 }
 
 model Batch {

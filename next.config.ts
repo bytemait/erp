@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   //   ignoreBuildErrors: true,
   // },
   reactStrictMode: false,
+  experimental: {
+    nodeMiddleware: true,
+  },
 };
 
 export default nextConfig;

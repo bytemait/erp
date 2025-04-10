@@ -10,10 +10,10 @@ import { Faculty } from "@prisma/client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<ApiResponse<Faculty | null>>> {
+	{ params }: { params: Promise<{ id : string }> }
+){
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), {
@@ -48,10 +48,11 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id : string }> }
 ): Promise<NextResponse<ApiResponse<Faculty | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
+
     const data = await req.json();
     const email = data.email;
 
@@ -108,10 +109,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id : string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "id is required"), {

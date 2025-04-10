@@ -12,10 +12,10 @@ import { env } from "@/utils/consts";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id : string }> }
 ): Promise<NextResponse<ApiResponse<Staff | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), {
@@ -52,10 +52,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id : string }> }
 ): Promise<NextResponse<ApiResponse<Staff | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await req.json();
     const new_password = data.new_password;
     const old_password = data.old_password;
@@ -165,10 +165,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id : string }> }
 ): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "id is required"), {

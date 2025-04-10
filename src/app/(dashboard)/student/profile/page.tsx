@@ -1,15 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/store/hooks";
+import axios from "axios";
 // import Image from "next/image";
 
-
 const initialProfileFields = [
-  // { key: "enrollmentNo", label: "Enrollment No", value: "-" },
-  // { key: "name", label: "Name", value: "-" },
-  // { key: "email", label: "Email", value: "-" },
+  { key: "enrollmentNo", label: "Enrollment No", value: "-" },
+  { key: "name", label: "Name", value: "-" },
+  { key: "email", label: "Email", value: "-" },
   { key: "dob", label: "Date of Birth", value: "-" },
   { key: "fullAddress", label: "Full Address", value: "-" },
   { key: "mobile", label: "Mobile Number", value: "-" },
@@ -55,32 +56,36 @@ const initialProfileFields = [
 const ProfilePage = () => {
   const [profileFields, setProfileFields] = useState(initialProfileFields);
   const [isEditing, setIsEditing] = useState(false);
-  const params = useParams();
-  const id = params.id;
+  // const params = useParams();
+  // const id = params.id;
+
+  const id = useAppSelector((state) => state.user.id);
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      try {
-        const response = await fetch(`/api/student/profile/${id}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        
-        const result = await response.json();
+      if (!id) return;
 
-        if (result.success && result.data) {
-          setProfileFields((prevFields) =>
-            prevFields.map((field) => ({
+      try {
+        const response = await axios.get(`/api/student/profile/${id}`, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.data.success && response.data.data) {
+          setProfileFields(prevFields =>
+            prevFields.map(field => ({
               ...field,
-              value: result.data[field.key] || result.data.details?.[field.key] || field.value,
+              value: response.data.data[field.key] ||
+                response.data.data.details?.[field.key] ||
+                field.value,
             }))
           );
-        } else {
-          console.error("Invalid API response:", result);
         }
       } catch (error) {
-        console.error("Error fetching profile data:", error);
+        if (axios.isAxiosError(error)) {
+          console.error("API Error:", error.response?.data || error.message);
+        }
       }
     };
 
@@ -97,36 +102,36 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      const updatedData: {  details: Record<string, string> } = { 
+      const updatedData: { details: Record<string, string> } = {
         // student: {}, 
-        details: {} 
+        details: {}
       };
-      
+
       profileFields.forEach(field => {
         let value = field.value.trim();
         value = value === "" ? "-" : String(value);
-      
+
         // if (["enrollmentNo", "name", "email", "isLateralEntry", "isAlumni"].includes(field.key)) {
         //   updatedData.student[field.key] = value;
         // } else {
         //   updatedData.details[field.key] = value;
         // }
 
-            updatedData.details[field.key] = value;
+        updatedData.details[field.key] = value;
       });
-      
-  
+
+
       console.log("Sending Data:", updatedData);
-  
+
       const response = await fetch(`/api/student/profile/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-  
+
       const result = await response.json();
       console.log("Response from API:", result);
-      
+
       if (result.success) {
         alert("Profile updated successfully!");
       } else {

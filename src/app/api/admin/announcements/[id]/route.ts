@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/utils/prisma";
-import { ApiResponse } from "@/types/apiResponse";
 import {
-	errorResponse,
-	successResponse,
-	failureResponse,
+  errorResponse,
+  successResponse,
+  failureResponse,
 } from "@/utils/response";
-import { Announcement } from "@prisma/client";
 import { getServerToken } from "@/utils/session";
 
 export async function GET(
-	req: NextRequest,
-	{ params }: { params: { id: string } }
-): Promise<NextResponse<ApiResponse<Announcement | null>>> {
-	try {
-		const { id } = await params;
+  request: NextRequest,
+      { params }: { params: Promise<{ id: string }> }
+){
+  try {
+    const { id } = await params;
 
-    const token = await getServerToken(req);
+    const token = await getServerToken(request);
 
     if (!token || !token.id) {
       return NextResponse.json(errorResponse(401, "Unauthorized"), {
@@ -26,22 +24,18 @@ export async function GET(
 
     const userId = token.id;
 
-
-    
-
-		if (!id) {
-			return NextResponse.json(errorResponse(400, "Id is required"), {
-				status: 400,
-			});
-		}
+    if (!id) {
+      return NextResponse.json(errorResponse(400, "Id is required"), {
+        status: 400,
+      });
+    }
     const annoucement = await prisma.announcement.findUnique({
       where: {
         id: String(id),
       },
     });
-    
-		
-    if(!annoucement){
+
+    if (!annoucement) {
       return NextResponse.json(errorResponse(404, "Announcement not found"), {
         status: 404,
       });
@@ -51,17 +45,13 @@ export async function GET(
         status: 401,
       });
     }
-	
-		return NextResponse.json(
-			successResponse(
-				200,
-				annoucement,
-				"Announcements fetched successfully"
-			),
-			{ status: 200 }
-		);
-	} catch (err) {
-		const error = err instanceof Error ? err.message : String(err);
-		return NextResponse.json(failureResponse(error), { status: 500 });
-	}
+
+    return NextResponse.json(
+      successResponse(200, annoucement, "Announcements fetched successfully"),
+      { status: 200 }
+    );
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(failureResponse(error), { status: 500 });
+  }
 }

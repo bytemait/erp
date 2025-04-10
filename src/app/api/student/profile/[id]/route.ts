@@ -13,17 +13,24 @@ function serializeBigInt<T>(obj: T): T {
   );
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<Student | null>>> {
+export async function GET(req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<ApiResponse<Student | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "Id is required"), { status: 400 });
     }
 
-    const profile = await prisma.student.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: String(id)
+      }
+    });
+
+    const profile = await prisma.student.findUnique({
+      where: {
+        id: user?.userId
       },
       include: {
         details: true
@@ -41,9 +48,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<Student | null>>> {
+export async function PATCH(req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<ApiResponse<Student | null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await req.json();
     const email = data.email;
     const enrollment = data.enrollmentNo;
@@ -65,15 +73,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     const student = await prisma.student.findUnique({
       where: { id: String(id) },
-      select: {studentDetailsId: true}
+      select: { studentDetailsId: true }
     });
 
     if (!student) {
       return NextResponse.json(errorResponse(404, "Student not found"), { status: 404 });
     }
 
-    if (studentdetails)
-    {
+    if (studentdetails) {
       const detailsupdatedProfile = await prisma.studentDetails.update({
         where: { id: String(student.studentDetailsId) },
         data: {
@@ -113,9 +120,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse<ApiResponse<null>>> {
+export async function DELETE(req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<ApiResponse<null>>> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(errorResponse(400, "id is required"), { status: 400 });
