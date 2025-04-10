@@ -12,7 +12,7 @@ const themes = ["light", "dark"];
 export default function UiSettingsPage() {
   const [settings, setSettings] = useState({
     theme: "light",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F5F5F5",
     primaryColor: "#1E88E5",
     secondaryColor: "#42A5F5",
     borderRadius: "4px",
@@ -57,7 +57,7 @@ export default function UiSettingsPage() {
   };
 
   return (
-    <div className="p-6 bg-primary text-secondary font-custom rounded-custom text-black">
+    <div className="p-6 bg-primary text-secondary font-custom rounded-custom">
       <h1 className="text-2xl font-bold mb-4">UI Settings</h1>
       <div className="space-y-4">
         <div>
@@ -163,12 +163,12 @@ export default function UiSettingsPage() {
           </select>
         </div>
       </div>
-      <Button className="mt-4" onClick={handleSave}>
+      <Button className="mt-4 " onClick={handleSave}>
         Save Settings
       </Button>
 
       {/* Testing dynamic styles */}
-      <div className="mt-6 text-secondary rounded-custom text-custom font-custom ">
+      <div className="mt-6 text-secondary rounded-custom text-custom font-custom">
         This is a dynamically styled component.
       </div>
     </div>
