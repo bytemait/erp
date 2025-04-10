@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+// import Image from "next/image";
+
 
 const initialProfileFields = [
   // { key: "enrollmentNo", label: "Enrollment No", value: "-" },
