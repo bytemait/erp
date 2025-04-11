@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {  Pencil, Trash2, Plus, Minus } from "lucide-react";
+import { Pencil, Trash2, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import * as XLSX from "xlsx";
 
 // Define TypeScript interfaces
 interface InventoryItem {
@@ -38,7 +39,6 @@ interface InventoryItem {
 const InfraSection = () => {
   // Sample data for inventory items
   const [items, setItems] = useState<InventoryItem[]>([
-    
     { id: "inv001cm8q601pu0", itemType: "PC", room: "5501", quantity: 10 },
     { id: "inv002cm8q601pu0", itemType: "Laptop", room: "5502", quantity: 5 },
     { id: "inv003cm8q601pu0", itemType: "Monitor", room: "5503", quantity: 15 },
@@ -47,12 +47,8 @@ const InfraSection = () => {
   ]);
 
   // Available rooms and item types
-  const [rooms, setRooms] = useState<string[]>([
-    "5501",
-    "5502",
-    "5503",
-  ]);
-  
+  const [rooms, setRooms] = useState<string[]>(["5501", "5502", "5503"]);
+
   const [itemTypes, setItemTypes] = useState<string[]>([
     "PC",
     "Laptop",
@@ -72,12 +68,69 @@ const InfraSection = () => {
   });
 
   // State for create room modal
-  const [showCreateRoomModal, setShowCreateRoomModal] = useState<boolean>(false);
+  const [showCreateRoomModal, setShowCreateRoomModal] =
+    useState<boolean>(false);
   const [newRoom, setNewRoom] = useState<string>("");
 
   // State for create item type modal
-  const [showCreateItemTypeModal, setShowCreateItemTypeModal] = useState<boolean>(false);
+  const [showCreateItemTypeModal, setShowCreateItemTypeModal] =
+    useState<boolean>(false);
   const [newItemType, setNewItemType] = useState<string>("");
+
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) setFile(selectedFile);
+  };
+
+  const handleFileUpload = async () => {
+    if (!file) return alert("Please select a file first");
+
+    try {
+      const parsedData = await parseExcelFile(file);
+
+      console.log("data : ", parsedData);
+
+      // const response = await axios.post()
+
+      alert("Items uploaded successfully!");
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to upload items");
+    }
+  };
+
+  const parseExcelFile = async (file: File) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const data = new Uint8Array(event.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        const formattedData = jsonData.map((row: any) => ({
+          itemCode: row.itemCode,
+          ItemTypeId: row.ItemTypeId || null,
+          RoomTypeId: row.RoomTypeId || null,
+          departmentId: row.departmentId || null,
+          roomNumber: row.roomNumber || null,
+          yearOfPurchase: row.yearOfPurchase || null,
+          status: row.status || "WORKING",
+        }));
+
+        resolve(formattedData);
+      };
+
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  };
 
   // Handle opening the item details modal
   const handleItemClick = (item: InventoryItem) => {
@@ -113,7 +166,7 @@ const InfraSection = () => {
   const handleCreateRoom = () => {
     if (newRoom && !rooms.includes(newRoom)) {
       setRooms([...rooms, newRoom]);
-      setNewItem({...newItem, room: newRoom});
+      setNewItem({ ...newItem, room: newRoom });
       setNewRoom("");
       setShowCreateRoomModal(false);
     }
@@ -123,7 +176,7 @@ const InfraSection = () => {
   const handleCreateItemType = () => {
     if (newItemType && !itemTypes.includes(newItemType)) {
       setItemTypes([...itemTypes, newItemType]);
-      setNewItem({...newItem, itemType: newItemType});
+      setNewItem({ ...newItem, itemType: newItemType });
       setNewItemType("");
       setShowCreateItemTypeModal(false);
     }
@@ -131,51 +184,59 @@ const InfraSection = () => {
 
   // Handle quantity increment/decrement
   const incrementQuantity = () => {
-    setNewItem({...newItem, quantity: newItem.quantity + 1});
+    setNewItem({ ...newItem, quantity: newItem.quantity + 1 });
   };
 
   const decrementQuantity = () => {
     if (newItem.quantity > 1) {
-      setNewItem({...newItem, quantity: newItem.quantity - 1});
+      setNewItem({ ...newItem, quantity: newItem.quantity - 1 });
     }
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (!isNaN(value) && value >= 1) {
-      setNewItem({...newItem, quantity: value});
+      setNewItem({ ...newItem, quantity: value });
     } else if (e.target.value === "") {
-      setNewItem({...newItem, quantity: 1});
+      setNewItem({ ...newItem, quantity: 1 });
     }
   };
 
   return (
     <>
       {/* Action bar */}
-      <div className="flex justify-between items-center mb-6">
-        <div>{/* Title could go here */}</div>
+      <div className="flex justify-end items-center mb-6 gap-4">
+        {/* xl file upload */}
+        <div className="p-2 border rounded-md shadow-sm w-fit">
+          <input type="file" accept=".xlsx" onChange={handleFileChange} />
+          <button
+            onClick={handleFileUpload}
+            className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Upload file
+          </button>
+        </div>
+
+        <span className="text-gray-500">OR</span>
+
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-slate-900 hover:bg-slate-800"
+          className="bg-slate-900 hover:bg-slate-800 text-white"
         >
           Create
         </Button>
       </div>
 
       {/* Inventory table */}
-      <div className="bg-white border rounded-sm">
+      <div className="bg-white border rounded-sm ">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-medium text-slate-600">
-                Id
-              </TableHead>
+              <TableHead className="font-medium text-slate-600">Id</TableHead>
               <TableHead className="font-medium text-slate-600">
                 Item Type
               </TableHead>
-              <TableHead className="font-medium text-slate-600">
-                Room
-              </TableHead>
+              <TableHead className="font-medium text-slate-600">Room</TableHead>
               <TableHead className="font-medium text-slate-600">
                 Quantity
               </TableHead>
@@ -228,21 +289,18 @@ const InfraSection = () => {
 
       {/* Item Details Modal */}
       <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white/90">
           <DialogHeader>
             <DialogTitle>Item Details</DialogTitle>
             <DialogDescription>
-              Detailed view of {selectedItem?.itemType} in{" "}
-              {selectedItem?.room}
+              Detailed view of {selectedItem?.itemType} in {selectedItem?.room}
             </DialogDescription>
           </DialogHeader>
           {selectedItem && (
             <div className="py-4">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <Label className="font-medium">
-                    Item Type
-                  </Label>
+                  <Label className="font-medium">Item Type</Label>
                   <p>{selectedItem.itemType}</p>
                 </div>
                 <div>
@@ -250,9 +308,7 @@ const InfraSection = () => {
                   <p>{selectedItem.room}</p>
                 </div>
                 <div>
-                  <Label className="font-medium">
-                    Quantity
-                  </Label>
+                  <Label className="font-medium">Quantity</Label>
                   <p>{selectedItem.quantity}</p>
                 </div>
               </div>
@@ -265,12 +321,8 @@ const InfraSection = () => {
                   {Array.from({
                     length: selectedItem.quantity,
                   }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="p-2 bg-slate-50 rounded-md"
-                    >
-                      {selectedItem.itemType} #{i + 1} in{" "}
-                      {selectedItem.room}
+                    <div key={i} className="p-2 bg-slate-50 rounded-md">
+                      {selectedItem.itemType} #{i + 1} in {selectedItem.room}
                     </div>
                   ))}
                 </div>
@@ -290,12 +342,10 @@ const InfraSection = () => {
 
       {/* Create Item Modal */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white/90">
           <DialogHeader>
             <DialogTitle>Create Item</DialogTitle>
-            <DialogDescription>
-              Add new inventory items
-            </DialogDescription>
+            <DialogDescription>Add new inventory items</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {/* Room Selection */}
@@ -304,9 +354,11 @@ const InfraSection = () => {
                 Room
               </Label>
               <div className="col-span-3 flex gap-2">
-                <Select 
-                  value={newItem.room} 
-                  onValueChange={(value) => setNewItem({...newItem, room: value})}
+                <Select
+                  value={newItem.room}
+                  onValueChange={(value) =>
+                    setNewItem({ ...newItem, room: value })
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a room" />
@@ -319,25 +371,27 @@ const InfraSection = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={() => setShowCreateRoomModal(true)}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            
+
             {/* Item Type Selection */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="itemType" className="text-right">
                 Item Type
               </Label>
               <div className="col-span-3 flex gap-2">
-                <Select 
-                  value={newItem.itemType} 
-                  onValueChange={(value) => setNewItem({...newItem, itemType: value})}
+                <Select
+                  value={newItem.itemType}
+                  onValueChange={(value) =>
+                    setNewItem({ ...newItem, itemType: value })
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select an item type" />
@@ -350,25 +404,25 @@ const InfraSection = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={() => setShowCreateItemTypeModal(true)}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            
+
             {/* Quantity Input with Increment/Decrement */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="quantity" className="text-right">
                 Quantity
               </Label>
               <div className="col-span-3 flex">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={decrementQuantity}
                   disabled={newItem.quantity <= 1}
                   className="rounded-r-none border-r-0"
@@ -383,9 +437,9 @@ const InfraSection = () => {
                   onChange={handleQuantityChange}
                   className="rounded-none text-center w-16"
                 />
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={incrementQuantity}
                   className="rounded-l-none border-l-0"
                 >
@@ -395,15 +449,14 @@ const InfraSection = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowCreateModal(false)}
-            >
+            <Button variant="outline" onClick={() => setShowCreateModal(false)}>
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateItem}
-              disabled={!newItem.itemType || !newItem.room || newItem.quantity < 1}
+              disabled={
+                !newItem.itemType || !newItem.room || newItem.quantity < 1
+              }
             >
               Create Item
             </Button>
@@ -441,7 +494,7 @@ const InfraSection = () => {
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateRoom}
               disabled={!newRoom || rooms.includes(newRoom)}
             >
@@ -452,7 +505,10 @@ const InfraSection = () => {
       </Dialog>
 
       {/* Create Item Type Modal */}
-      <Dialog open={showCreateItemTypeModal} onOpenChange={setShowCreateItemTypeModal}>
+      <Dialog
+        open={showCreateItemTypeModal}
+        onOpenChange={setShowCreateItemTypeModal}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create New Item Type</DialogTitle>
@@ -481,7 +537,7 @@ const InfraSection = () => {
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleCreateItemType}
               disabled={!newItemType || itemTypes.includes(newItemType)}
             >

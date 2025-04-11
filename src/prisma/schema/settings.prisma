@@ -7,7 +7,7 @@ model Settings {
   secondaryColor    String   @default("#42A5F5")
   borderRadius      String   @default("4px") 
   fontSize          FontSize @default(BASE)
-  fontWeight        FontWeight @default(NORMAL)
+  fontWeight        FontWeight @default(FontWeight)
   headingFont       FontType @default(INTER) 
   textFont          FontType @default(OPEN_SANS) 
   createdAt         DateTime @default(now())
