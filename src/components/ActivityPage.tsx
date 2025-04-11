@@ -70,7 +70,7 @@ export default function ActivityPage() {
                     <TabsTrigger value="announcements">All Announcements</TabsTrigger>
                 </TabsList>
                 <TabsContent value="notifications">
-                    {notifications.length > 0 ? notifications.map((item) => (
+                    {notifications?.length > 0 ? notifications.map((item) => (
                         <ActivityItem
                             key={item.id}
                             icon={<Bell className="h-4 w-4" />}
