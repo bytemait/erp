@@ -169,7 +169,7 @@ export default function ConfigureSection({
             Create New {title}
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>{editingItem ? `Edit ${title}` : `Create New ${title}`}</DialogTitle>
           </DialogHeader>
@@ -191,7 +191,7 @@ export default function ConfigureSection({
         </DialogContent>
       </Dialog>
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
           </DialogHeader>

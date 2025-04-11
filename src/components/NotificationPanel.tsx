@@ -36,7 +36,7 @@ export function NotificationPanel() {
         <DropdownMenuContent className="w-80" align="end" forceMount>
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {notifications.length > 0 ? notifications?.map((item) => (
+            {notifications?.length > 0 ? notifications?.map((item) => (
                 <DropdownMenuItem key={item.id} className="flex flex-col items-start py-2">
                     <span className="font-medium">{item.title}</span>
                     <span className="text-sm text-muted-foreground">{item.message}</span>
